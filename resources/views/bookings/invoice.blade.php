@@ -178,11 +178,11 @@
                         <td>
                             <strong>{{ \App\Helpers\AmountHelper::toBengaliNumber(\Carbon\Carbon::parse($item->event_date)->format('d/m/Y')) }}</strong><br>
                             <strong>অনুষ্ঠানের ধরনঃ</strong> 
-                            @if($item->event_type == 'Wedding') বিবাহ
-                            @elseif($item->event_type == 'Holud') হলুদ
-                            @elseif($item->event_type == 'Birthday') জন্মদিন
+                            @if($item->event_type == 'Wedding') বিবাহ (Wedding Reception)
+                            @elseif($item->event_type == 'Holud') গায়ে হলুদ (Gaye Holud)
+                            @elseif($item->event_type == 'Birthday') জন্মদিন (Birthday Party)
                             @elseif($item->event_type == 'Corporate') কর্পোরেট
-                            @else অন্যান্য @endif
+                            @else {{ $item->event_type ?? 'অন্যান্য' }} @endif
                             <br>
                             <strong>সময়ঃ</strong> 
                             @if($item->slot == 'day' || $item->slot == 'morning') দিন (Day)

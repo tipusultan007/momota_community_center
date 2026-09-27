@@ -121,23 +121,27 @@
                                             <td class="text-end text-success font-weight-bold">৳ {{ number_format($income->amount, 2) }}</td>
                                             <td class="text-center">
                                                 <div class="dropdown">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle align-text-top" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-auto-close="true" aria-expanded="false">
-                                                        একশন
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
+                                                        অ্যাকশন
                                                     </button>
-                                                    <div class="dropdown-menu dropdown-menu-end shadow">
-                                                        <a class="dropdown-item" href="{{ route('incomes.edit', $income) }}">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-warning me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
-                                                            এডিট
-                                                        </a>
-                                                        <form action="{{ route('incomes.destroy', $income) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই আয়টি মুছে ফেলতে চান?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-danger me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
-                                                                ডিলিট
-                                                            </button>
-                                                        </form>
-                                                    </div>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                        <li>
+                                                            <a class="dropdown-item" href="{{ route('incomes.edit', $income) }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-warning me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
+                                                                এডিট
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <form action="{{ route('incomes.destroy', $income) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই আয়টি মুছে ফেলতে চান?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-danger me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                                                                    ডিলিট
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>

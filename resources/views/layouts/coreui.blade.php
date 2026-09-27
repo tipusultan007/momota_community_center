@@ -234,6 +234,41 @@
 
 <!-- CoreUI + vendors (from local coreui/ folder) -->
 <script src="{{ asset('coreui/vendors/@coreui/coreui/js/coreui.bundle.min.js') }}"></script>
+<script>
+    if (window.coreui) {
+        window.bootstrap = window.coreui;
+    }
+    // Auto-shim any Bootstrap data-bs-* attributes so CoreUI handles them
+    (function() {
+        function shimBootstrapDataAttrs() {
+            document.querySelectorAll('[data-bs-toggle]').forEach(function(el) {
+                if (!el.hasAttribute('data-coreui-toggle')) {
+                    el.setAttribute('data-coreui-toggle', el.getAttribute('data-bs-toggle'));
+                }
+            });
+            document.querySelectorAll('[data-bs-target]').forEach(function(el) {
+                if (!el.hasAttribute('data-coreui-target')) {
+                    el.setAttribute('data-coreui-target', el.getAttribute('data-bs-target'));
+                }
+            });
+            document.querySelectorAll('[data-bs-dismiss]').forEach(function(el) {
+                if (!el.hasAttribute('data-coreui-dismiss')) {
+                    el.setAttribute('data-coreui-dismiss', el.getAttribute('data-bs-dismiss'));
+                }
+            });
+            document.querySelectorAll('[data-bs-auto-close]').forEach(function(el) {
+                if (!el.hasAttribute('data-coreui-auto-close')) {
+                    el.setAttribute('data-coreui-auto-close', el.getAttribute('data-bs-auto-close'));
+                }
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', shimBootstrapDataAttrs);
+        } else {
+            shimBootstrapDataAttrs();
+        }
+    })();
+</script>
 <script src="{{ asset('coreui/vendors/simplebar/js/simplebar.min.js') }}"></script>
 <script src="{{ asset('coreui/vendors/chart.js/js/chart.umd.js') }}"></script>
 <script src="{{ asset('coreui/vendors/@coreui/chartjs/js/coreui-chartjs.js') }}"></script>
