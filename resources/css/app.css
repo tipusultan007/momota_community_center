@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        font-family: 'Anek Bangla', 'Inter', sans-serif;
+        @apply bg-background text-on-background;
+    }
+    h1, h2, h3, .font-headline {
+        font-family: 'Anek Bangla', 'Inter', sans-serif;
+    }
+}
+
+@layer components {
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid theme('colors.primary/10');
+    }
+
+    /* Namespaced Modern UI to override Tabler/Bootstrap */
+    #prangan-modern-ui {
+        --tblr-primary: #0F172A;
+        --tblr-secondary: #10B981;
+    }
+
+    #prangan-modern-ui .pricing-card {
+        @apply transition-all duration-500 ease-out border-0 shadow-lg !bg-white !rounded-[3.5rem] !p-0 !m-0;
+        position: relative !important;
+        overflow: visible !important;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    #prangan-modern-ui .pricing-card:hover {
+        @apply -translate-y-4 shadow-2xl;
+    }
+
+    #prangan-modern-ui .card-body {
+        padding: 0 !important;
+        flex: 1 1 auto !important;
+        background: transparent !important;
+    }
+
+    /* Refined Checkmarks (Removing Boxy Look) */
+    .checkmark-pill {
+        @apply w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 transition-colors duration-300;
+    }
+    .pricing-card:hover .checkmark-pill {
+        @apply bg-secondary text-white;
+    }
+
+    /* Modal Compact Refinements */
+    #prangan-modern-ui .compact-modal .modal-content {
+        @apply !rounded-[2.5rem] border-0 overflow-hidden shadow-2xl !bg-white;
+    }
+    
+    #prangan-modern-ui .compact-modal .modal-body {
+        padding: 1.5rem !important;
+    }
+
+    #prangan-modern-ui .modern-input {
+        @apply !w-full !rounded-xl !py-3 !ps-12 !border-neutral focus:!border-secondary focus:!ring-0 transition-all !font-black !h-auto !text-sm !bg-neutral/30;
+        appearance: none !important;
+    }
+
+    .primary-gradient {
+        background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
+    }
+    .secondary-gradient {
+        background: linear-gradient(135deg, #10B981 0%, #34d399 100%) !important;
+    }
+    .tertiary-gradient {
+        background: linear-gradient(135deg, #D4AF37 0%, #fbbf24 100%) !important;
+    }
+
+    .material-symbols-outlined {
+        font-family: 'Material Symbols Outlined' !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block !important;
+        vertical-align: middle;
+        line-height: 1;
+        font-style: normal;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .glass-dark {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mesh-gradient-bg {
+        background: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 50%),
+                    radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.04) 0px, transparent 50%),
+                    #F8FAFC;
+    }
+
+    .mesh-dark-bg {
+        background: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.18) 0px, transparent 55%),
+                    radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.15) 0px, transparent 50%),
+                    #0F172A;
+    }
+
+    @keyframes float-slow {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+    }
+
+    @keyframes float-reverse {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(8px); }
+    }
+
+    .animate-float {
+        animation: float-slow 4s ease-in-out infinite;
+    }
+
+    .animate-float-delayed {
+        animation: float-reverse 5s ease-in-out infinite;
+    }
+}
+

@@ -1,0 +1,76 @@
+/* Tabler -> CoreUI/Bootstrap compatibility shim.
+   Lets existing inner pages (built with Tabler utility classes) render
+   sensibly inside the new CoreUI shell without rewriting ~30 views. */
+
+.page-header { margin-bottom: 1rem; }
+.page-pretitle { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--cui-secondary-color, #6c757d); font-weight: 600; }
+.page-title { font-size: 1.35rem; font-weight: 700; margin: 0; }
+.page-body { padding-bottom: 1rem; }
+
+/* Tabler row-cards gutter */
+.row-cards { --cui-gutter-y: 1rem; }
+.row-cards > [class*="col"] { margin-bottom: 1rem; }
+
+/* Cards */
+.card-sm .card-body { padding: .9rem 1rem; }
+.card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0; }
+.card-actions { display: flex; gap: .5rem; align-items: center; }
+.card-table { margin-bottom: 0; }
+
+/* Tables */
+.table-vcenter > :not(caption) > * > * { vertical-align: middle; }
+.table-mobile-md { width: 100%; }
+
+/* Avatars (Tabler) */
+.avatar {
+  --tblr-avatar-size: 2.5rem;
+  width: var(--tblr-avatar-size); height: var(--tblr-avatar-size);
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: .5rem; font-weight: 700; flex-shrink: 0;
+  background: var(--cui-primary-bg-subtle, #e7e9fc); color: var(--cui-primary, #5856d6);
+}
+.avatar-sm { --tblr-avatar-size: 2rem; font-size: .8rem; }
+.avatar-lg { --tblr-avatar-size: 3rem; font-size: 1.1rem; }
+.avatar.rounded-3 { border-radius: .65rem !important; }
+.avatar.rounded-circle { border-radius: 50% !important; }
+
+/* Tabler light-background badges -> Bootstrap subtle backgrounds */
+.bg-blue-lt { background: rgba(13,110,253,.12) !important; color: #0d6efd !important; }
+.bg-azure-lt { background: rgba(13,202,240,.14) !important; color: #0aa2c0 !important; }
+.bg-indigo-lt { background: rgba(102,16,242,.12) !important; color: #6610f2 !important; }
+.bg-purple-lt { background: rgba(111,66,193,.12) !important; color: #6f42c1 !important; }
+.bg-success-lt, .bg-green-lt, .bg-teal-lt { background: rgba(25,135,84,.12) !important; color: #198754 !important; }
+.bg-warning-lt, .bg-yellow-lt, .bg-orange-lt { background: rgba(255,193,7,.18) !important; color: #997404 !important; }
+.bg-danger-lt, .bg-red-lt { background: rgba(220,53,69,.12) !important; color: #dc3545 !important; }
+.bg-info-lt, .bg-cyan-lt { background: rgba(13,202,240,.14) !important; color: #0aa2c0 !important; }
+.bg-secondary-lt, .bg-muted-lt, .bg-gray-lt { background: rgba(108,117,125,.14) !important; color: #6c757d !important; }
+.bg-dark-lt { background: rgba(33,37,41,.1) !important; color: #212529 !important; }
+.text-blue { color: #0d6efd !important; }
+.text-muted-dark { color: #495057 !important; }
+
+/* Buttons */
+.btn-list { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; }
+.btn-ghost-light, .btn-ghost-secondary { background: transparent; border: 1px solid var(--cui-border-color, #dee2e6); }
+.btn-ghost-light:hover { background: var(--cui-tertiary-bg, #f8f9fa); }
+
+/* Forms */
+.input-icon { position: relative; }
+.input-icon-addon {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  display: flex; align-items: center; padding: 0 .75rem;
+  color: #6c757d; pointer-events: none;
+}
+.input-icon .form-control { padding-left: 2.4rem; }
+.form-label { font-weight: 600; }
+.font-weight-medium { font-weight: 500 !important; }
+
+/* Tabler icons sizing */
+.icon { width: 1.25rem; height: 1.25rem; vertical-align: -0.3em; }
+.icon-xs, .icon.icon-xs { width: .9rem; height: .9rem; }
+.icon-inline { display: inline-block; vertical-align: middle; }
+.dropdown-item-icon { margin-right: .5rem; opacity: .7; }
+.alert-icon { margin-right: .5rem; }
+
+/* Keep legacy dark-gradient stat cards readable under CoreUI */
+.card.text-white .text-muted, .card.text-white .text-muted-dark { color: rgba(255,255,255,.75) !important; }

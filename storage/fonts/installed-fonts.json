@@ -1,0 +1,13 @@
+{
+    "solaimanlipi": {
+        "normal": "solaimanlipi_normal_5b8bf7fa9ff1a546774063a02f2a5f6e"
+    },
+    "kalpurush": {
+        "normal": "kalpurush_normal_dba68cca6182143e70e649cf9cf5f832"
+    },
+    "hind siliguri": {
+        "normal": "D:\\wampserver_backup\\saas-convention-hall\\storage\\fonts\/hind_siliguri_normal_537d786232cda07937042401f62d84a1",
+        "bold": "D:\\wampserver_backup\\saas-convention-hall\\storage\\fonts\/hind_siliguri_bold_f56ed2c646b455ab164792870dfc41c4",
+        "600": "hind_siliguri_600_f56ed2c646b455ab164792870dfc41c4"
+    }
+}
