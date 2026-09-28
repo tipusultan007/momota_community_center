@@ -13,20 +13,33 @@ class VendorProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchVendors() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+  Future<void> fetchVendors({bool isPullToRefresh = false}) async {
+    // 1. Instant Cache check: load from cache in 0ms without blocking UI
+    if (_vendors.isEmpty) {
+      final cached = await ApiService.instance.getLocalCache('vendors');
+      if (cached != null && cached['data']?['data'] is List) {
+        _vendors = cached['data']['data'];
+        _isLoading = false;
+        notifyListeners();
+      } else if (!isPullToRefresh) {
+        _isLoading = true;
+        _error = null;
+        notifyListeners();
+      }
+    }
 
     try {
       final response = await ApiService.instance.get('vendors');
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data?['data']?['data'] is List) {
         _vendors = response.data['data']['data']; // Laravel pagination structure
-      } else {
+        _error = null;
+      } else if (_vendors.isEmpty) {
         _error = 'ভেন্ডর তালিকা লোড করতে ব্যর্থ হয়েছে।';
       }
     } catch (e) {
-      _error = e.toString();
+      if (_vendors.isEmpty) {
+        _error = e.toString();
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

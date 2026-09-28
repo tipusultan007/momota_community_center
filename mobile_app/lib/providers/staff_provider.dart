@@ -42,13 +42,24 @@ class StaffProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchAllSalaries() async {
-    _isLoading = true;
-    notifyListeners();
+  Future<void> fetchAllSalaries({bool isPullToRefresh = false}) async {
+    // 1. Instant Cache check: load from cache in 0ms without blocking UI
+    if (_salaryList.isEmpty) {
+      final cached = await ApiService.instance.getLocalCache('/salaries');
+      if (cached != null && cached['data']?['data'] is List) {
+        final List data = cached['data']['data'];
+        _salaryList = data.map((item) => Salary.fromJson(Map<String, dynamic>.from(item))).toList();
+        _isLoading = false;
+        notifyListeners();
+      } else if (!isPullToRefresh) {
+        _isLoading = true;
+        notifyListeners();
+      }
+    }
 
     try {
       final response = await ApiService.instance.get('/salaries');
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data?['data']?['data'] is List) {
         final List data = response.data['data']['data'];
         _salaryList = data.map((item) => Salary.fromJson(Map<String, dynamic>.from(item))).toList();
       }

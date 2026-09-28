@@ -31,20 +31,34 @@ class HallProvider with ChangeNotifier {
     };
   }
 
-  Future<void> fetchHalls() async {
-    _isLoading = true;
-    notifyListeners();
+  Future<void> fetchHalls({bool isPullToRefresh = false}) async {
+    // 1. Instant Cache check
+    if (_halls.isEmpty) {
+      final cached = await ApiService.instance.getLocalCache('halls');
+      if (cached != null && cached['data'] is List) {
+        _halls = cached['data'];
+        final storedId = await ApiService.instance.getActiveHallId();
+        if (storedId != null) {
+          _activeHallId = int.tryParse(storedId);
+        }
+        if (_activeHallId == null && _halls.isNotEmpty) {
+          _activeHallId = _halls.first['id'];
+        }
+        _isLoading = false;
+        notifyListeners();
+      } else if (!isPullToRefresh) {
+        _isLoading = true;
+        notifyListeners();
+      }
+    }
 
     try {
-      print('Fetching halls from api/halls...');
       final response = await ApiService.instance.get('halls');
-      print('Halls response: ${response.statusCode}');
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data?['data'] is List) {
         _halls = response.data['data'];
-        print('Loaded ${_halls.length} halls');
         
         // Load persisted hall ID or default to first
-        final storedId = await _storage.read(key: 'active_hall_id');
+        final storedId = await ApiService.instance.getActiveHallId();
         if (storedId != null) {
           _activeHallId = int.tryParse(storedId);
         }
@@ -54,10 +68,11 @@ class HallProvider with ChangeNotifier {
         }
         if (_activeHallId != null) {
           await _storage.write(key: 'active_hall_id', value: _activeHallId.toString());
+          ApiService.instance.updateActiveHallId(_activeHallId.toString());
         }
       }
     } catch (e) {
-      print('Error fetching halls: $e');
+      debugPrint('Error fetching halls: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -67,6 +82,7 @@ class HallProvider with ChangeNotifier {
   Future<void> switchHall(int id) async {
     _activeHallId = id;
     await _storage.write(key: 'active_hall_id', value: id.toString());
+    ApiService.instance.updateActiveHallId(id.toString());
     notifyListeners();
   }
 }

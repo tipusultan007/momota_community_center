@@ -27,6 +27,34 @@ class ApiService {
     return path;
   }
 
+  String? _cachedToken;
+  String? _cachedActiveHallId;
+
+  Future<String?> getToken() async {
+    if (_cachedToken != null) return _cachedToken;
+    _cachedToken = await _storage.read(key: AppConstants.tokenKey);
+    return _cachedToken;
+  }
+
+  Future<String?> getActiveHallId() async {
+    if (_cachedActiveHallId != null) return _cachedActiveHallId;
+    _cachedActiveHallId = await _storage.read(key: 'active_hall_id');
+    return _cachedActiveHallId;
+  }
+
+  void updateToken(String? token) {
+    _cachedToken = token;
+  }
+
+  void updateActiveHallId(String? hallId) {
+    _cachedActiveHallId = hallId;
+  }
+
+  void clearAuthCache() {
+    _cachedToken = null;
+    _cachedActiveHallId = null;
+  }
+
   ApiService._internal() {
     _dio = Dio(BaseOptions(
       baseUrl: AppConstants.baseUrl,
@@ -40,12 +68,12 @@ class ApiService {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _storage.read(key: AppConstants.tokenKey);
+        final token = await getToken();
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
         
-        final activeHallId = await _storage.read(key: 'active_hall_id');
+        final activeHallId = await getActiveHallId();
         if (activeHallId != null && !options.headers.containsKey('X-Hall-Id')) {
           options.headers['X-Hall-Id'] = activeHallId;
         }
@@ -105,7 +133,7 @@ class ApiService {
   final Map<String, dynamic> _memoryCache = {};
 
   Future<String> _generateCacheKey(String path, Map<String, dynamic>? queryParameters) async {
-    final activeHallId = await _storage.read(key: 'active_hall_id') ?? 'default';
+    final activeHallId = await getActiveHallId() ?? 'default';
     final normalizedPath = path.startsWith('/') ? path : '/$path';
     if (queryParameters == null || queryParameters.isEmpty) {
       return '[$activeHallId]$normalizedPath';
@@ -260,7 +288,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await _storage.read(key: 'active_hall_id');
+        final activeHallId = await getActiveHallId();
         await DatabaseService.instance.addToQueue('POST', cleanPath, data, hallId: activeHallId);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
@@ -284,7 +312,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await _storage.read(key: 'active_hall_id');
+        final activeHallId = await getActiveHallId();
         await DatabaseService.instance.addToQueue('PUT', cleanPath, data, hallId: activeHallId);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
@@ -308,7 +336,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await _storage.read(key: 'active_hall_id');
+        final activeHallId = await getActiveHallId();
         await DatabaseService.instance.addToQueue('PATCH', cleanPath, data, hallId: activeHallId);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
@@ -332,7 +360,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await _storage.read(key: 'active_hall_id');
+        final activeHallId = await getActiveHallId();
         await DatabaseService.instance.addToQueue('DELETE', cleanPath, queryParameters, hallId: activeHallId);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);

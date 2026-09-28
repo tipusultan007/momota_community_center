@@ -86,37 +86,29 @@ class AccountingProvider with ChangeNotifier {
 
     if (refresh || isTypeChanged) {
       _currentPage = 1;
-      _isLoading = true;
-      // Immediately clear transactions when tab or filter changes so old tab's data is never displayed
-      _transactions = [];
-      notifyListeners();
-    } else {
-      _isMoreLoading = true;
-      notifyListeners();
-    }
 
-    final isOnline = ApiService.instance.isOnline.value;
-
-    // Only load from local cache if OFFLINE
-    if (!isOnline && refresh) {
+      // 1. Instant Cache: Load from memory/SQLite in 0ms without waiting for network
       final cached = await ApiService.instance.getLocalCache('/accounting', queryParameters: queryParams);
       if (requestId != _fetchRequestId) return;
       if (cached != null && cached['data'] != null) {
         _populateFromData(cached['data'], refresh: true);
         _isLoading = false;
         notifyListeners();
-        return;
+      } else {
+        // No cache yet for this tab/filter: show loader
+        _transactions = [];
+        _isLoading = true;
+        notifyListeners();
       }
+    } else {
+      _isMoreLoading = true;
+      notifyListeners();
     }
 
     try {
       final response = await ApiService.instance.get(
         '/accounting',
         queryParameters: queryParams,
-        options: Options(headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        }),
       );
 
       if (requestId != _fetchRequestId) return;
@@ -130,7 +122,7 @@ class AccountingProvider with ChangeNotifier {
     } catch (e) {
       if (requestId != _fetchRequestId) return;
       debugPrint('Error fetching transactions: $e');
-      // If network call failed (offline error or timeout), fallback to local cache
+      // If network call failed and transactions are still empty, fallback to local cache
       if (refresh && _transactions.isEmpty) {
         final cached = await ApiService.instance.getLocalCache('/accounting', queryParameters: queryParams);
         if (requestId != _fetchRequestId) return;

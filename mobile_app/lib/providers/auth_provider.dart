@@ -97,6 +97,7 @@ class AuthProvider with ChangeNotifier {
         _user = response.data['user'];
         await _storage.write(key: AppConstants.tokenKey, value: token);
         await _storage.write(key: 'cached_user_profile', value: jsonEncode(_user));
+        ApiService.instance.updateToken(token);
         _isAuthenticated = true;
         _isLoading = false;
         await fetchSubscription();
@@ -134,6 +135,7 @@ class AuthProvider with ChangeNotifier {
         _user = response.data['user'];
         await _storage.write(key: AppConstants.tokenKey, value: token);
         await _storage.write(key: 'cached_user_profile', value: jsonEncode(_user));
+        ApiService.instance.updateToken(token);
         _isAuthenticated = true;
         _isLoading = false;
         await fetchSubscription();
@@ -186,6 +188,7 @@ class AuthProvider with ChangeNotifier {
     await _storage.delete(key: 'cached_user_profile');
     await _storage.delete(key: 'cached_subscription');
     await DatabaseService.instance.clearDatabase();
+    ApiService.instance.clearAuthCache();
     _isAuthenticated = false;
     _user = null;
     _subscription = null;

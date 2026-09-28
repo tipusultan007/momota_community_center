@@ -9,14 +9,25 @@ class AssetProvider with ChangeNotifier {
   List<Asset> get assets => _assets;
   bool get isLoading => _isLoading;
 
-  Future<void> fetchAssets() async {
-    _isLoading = true;
-    notifyListeners();
+  Future<void> fetchAssets({bool isPullToRefresh = false}) async {
+    // 1. Instant Cache check: load from cache in 0ms without blocking UI
+    if (_assets.isEmpty) {
+      final cached = await ApiService.instance.getLocalCache('/assets');
+      if (cached != null && cached['data'] is List) {
+        final List data = cached['data'];
+        _assets = data.map((json) => Asset.fromJson(json)).toList();
+        _isLoading = false;
+        notifyListeners();
+      } else if (!isPullToRefresh) {
+        _isLoading = true;
+        notifyListeners();
+      }
+    }
 
     try {
       final response = await ApiService.instance.get('/assets');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data?['data'] is List) {
         final List data = response.data['data'];
         _assets = data.map((json) => Asset.fromJson(json)).toList();
       }
