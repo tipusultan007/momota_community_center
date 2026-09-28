@@ -19,7 +19,8 @@ class ReportController extends Controller
         $startDate = $request->query('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->query('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        $bookings = Booking::when($hallId, function ($query) use ($hallId) {
+        $bookings = Booking::select('id', 'status')
+            ->when($hallId, function ($query) use ($hallId) {
                 return $query->where('hall_id', $hallId);
             })
             ->whereHas('items', function ($query) use ($startDate, $endDate) {
@@ -27,13 +28,16 @@ class ReportController extends Controller
             })
             ->get();
 
-        $incomes = Income::when($hallId, function ($query) use ($hallId) {
+        $incomes = (float) Income::when($hallId, function ($query) use ($hallId) {
                 return $query->where('hall_id', $hallId);
             })
             ->whereBetween('date', [$startDate, $endDate])
             ->sum('amount');
 
-        $expenses = Expense::whereBetween('date', [$startDate, $endDate])
+        $expenses = (float) Expense::when($hallId, function ($query) use ($hallId) {
+                return $query->where('hall_id', $hallId);
+            })
+            ->whereBetween('date', [$startDate, $endDate])
             ->sum('amount');
 
         return response()->json([

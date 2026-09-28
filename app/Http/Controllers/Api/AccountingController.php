@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\Income;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class AccountingController extends Controller
 {
@@ -15,90 +18,155 @@ class AccountingController extends Controller
         $year = $request->year;
         $hallId = $request->header('X-Hall-Id');
         $type = $request->query('type', 'all'); // 'all', 'income', 'expense'
-        $perPage = $request->query('per_page', 20);
-
-        // Summary queries (always calculate totals based on filters, regardless of pagination)
-        $incomeQuery = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->when($month, fn($q) => $q->whereMonth('date', $month))
-            ->when($year, fn($q) => $q->whereYear('date', $year));
-            
-        $expenseQuery = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->when($month, fn($q) => $q->whereMonth('date', $month))
-            ->when($year, fn($q) => $q->whereYear('date', $year));
-
-        $totalIncome = (float) $incomeQuery->sum('amount');
-        $totalExpense = (float) $expenseQuery->sum('amount');
-
-        // Result collection
+        $perPage = (int) $request->query('per_page', 20);
         $currentPage = (int) $request->query('page', 1);
+
+        $applyDateFilter = function ($query) use ($year, $month) {
+            if ($year && $month) {
+                $startDate = sprintf('%04d-%02d-01', $year, $month);
+                $endDate = Carbon::parse($startDate)->endOfMonth()->toDateString();
+                return $query->whereBetween('date', [$startDate, $endDate]);
+            } elseif ($year) {
+                return $query->whereBetween('date', ["{$year}-01-01", "{$year}-12-31"]);
+            } elseif ($month) {
+                return $query->whereMonth('date', $month);
+            }
+            return $query;
+        };
+
+        // Summary queries with index-friendly date filters
+        $incomeBase = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        $applyDateFilter($incomeBase);
+
+        $expenseBase = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        $applyDateFilter($expenseBase);
+
+        $totalIncome = (float) (clone $incomeBase)->sum('amount');
+        $totalExpense = (float) (clone $expenseBase)->sum('amount');
+
+        // Result collection with database pagination
         $totalCount = 0;
         $lastPage = 1;
 
         if ($type === 'income') {
-            $results = $incomeQuery->with('incomeCategory')->orderByDesc('date')->paginate($perPage);
+            $results = (clone $incomeBase)
+                ->with('incomeCategory')
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->paginate($perPage);
+
             $transactions = collect($results->items())->map(fn($i) => array_merge($i->toArray(), ['type' => 'income']));
             $totalCount = $results->total();
             $lastPage = $results->lastPage();
             $currentPage = $results->currentPage();
         } elseif ($type === 'expense') {
-            $results = $expenseQuery->with('expenseCategory')->orderByDesc('date')->paginate($perPage);
+            $results = (clone $expenseBase)
+                ->with('expenseCategory')
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->paginate($perPage);
+
             $transactions = collect($results->items())->map(fn($i) => array_merge($i->toArray(), ['type' => 'expense']));
             $totalCount = $results->total();
             $lastPage = $results->lastPage();
             $currentPage = $results->currentPage();
         } else {
-            $incomes = $incomeQuery->with('incomeCategory')->get()->map(function ($i) {
-                $arr = is_array($i) ? $i : (method_exists($i, 'toArray') ? $i->toArray() : (array)$i);
-                return array_merge($arr, ['type' => 'income']);
-            });
-            $expenses = $expenseQuery->with('expenseCategory')->get()->map(function ($e) {
-                $arr = is_array($e) ? $e : (method_exists($e, 'toArray') ? $e->toArray() : (array)$e);
-                return array_merge($arr, ['type' => 'expense']);
-            });
-            
-            $combined = $incomes->concat($expenses)->sortByDesc('date');
-            $totalCount = $combined->count();
+            // Paginate across both tables directly via database UNION of IDs
+            $incomeCount = (clone $incomeBase)->count();
+            $expenseCount = (clone $expenseBase)->count();
+            $totalCount = $incomeCount + $expenseCount;
             $lastPage = max(1, (int) ceil($totalCount / $perPage));
-            $transactions = $combined->forPage($currentPage, $perPage)->values();
+            $offset = ($currentPage - 1) * $perPage;
+
+            $incomeSub = DB::table('incomes')
+                ->selectRaw("id, 'income' as type, date")
+                ->when($hallId, fn($q) => $q->where('hall_id', $hallId));
+            $applyDateFilter($incomeSub);
+
+            $expenseSub = DB::table('expenses')
+                ->selectRaw("id, 'expense' as type, date")
+                ->when($hallId, fn($q) => $q->where('hall_id', $hallId));
+            $applyDateFilter($expenseSub);
+
+            $pageRows = DB::query()
+                ->fromSub($incomeSub->unionAll($expenseSub), 'combined_tx')
+                ->orderByDesc('date')
+                ->orderByDesc('id')
+                ->offset($offset)
+                ->limit($perPage)
+                ->get();
+
+            $incomeIds = $pageRows->where('type', 'income')->pluck('id')->all();
+            $expenseIds = $pageRows->where('type', 'expense')->pluck('id')->all();
+
+            $incomesById = empty($incomeIds) ? collect() : Income::with('incomeCategory')
+                ->whereIn('id', $incomeIds)
+                ->get()
+                ->keyBy('id');
+
+            $expensesById = empty($expenseIds) ? collect() : Expense::with('expenseCategory')
+                ->whereIn('id', $expenseIds)
+                ->get()
+                ->keyBy('id');
+
+            $transactions = $pageRows->map(function ($row) use ($incomesById, $expensesById) {
+                if ($row->type === 'income') {
+                    $model = $incomesById->get($row->id);
+                    return $model ? array_merge($model->toArray(), ['type' => 'income']) : null;
+                } else {
+                    $model = $expensesById->get($row->id);
+                    return $model ? array_merge($model->toArray(), ['type' => 'expense']) : null;
+                }
+            })->filter()->values();
         }
 
-        // Monthly trends for the current year
-        $trends = [];
-        $currentYear = $year ?? now()->year;
-        for ($m = 1; $m <= 12; $m++) {
-            $mIncome = (float) Income::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-                ->whereYear('date', $currentYear)
-                ->whereMonth('date', $m)
-                ->sum('amount');
-                
-            $mExpense = (float) Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-                ->whereYear('date', $currentYear)
-                ->whereMonth('date', $m)
-                ->sum('amount');
+        // Monthly trends for the year: aggregated in 2 single queries instead of 24 queries in a loop!
+        $currentYear = (int) ($year ?? now()->year);
+        $yearStart = "{$currentYear}-01-01";
+        $yearEnd = "{$currentYear}-12-31";
+        $monthExpr = DB::getDriverName() === 'sqlite'
+            ? "CAST(strftime('%m', date) AS INTEGER)"
+            : "MONTH(date)";
 
+        $monthlyIncomes = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId))
+            ->whereBetween('date', [$yearStart, $yearEnd])
+            ->selectRaw("{$monthExpr} as month_num, SUM(amount) as total")
+            ->groupBy('month_num')
+            ->pluck('total', 'month_num')
+            ->all();
+
+        $monthlyExpenses = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId))
+            ->whereBetween('date', [$yearStart, $yearEnd])
+            ->selectRaw("{$monthExpr} as month_num, SUM(amount) as total")
+            ->groupBy('month_num')
+            ->pluck('total', 'month_num')
+            ->all();
+
+        $trends = [];
+        for ($m = 1; $m <= 12; $m++) {
             $trends[] = [
                 'month' => date('M', mktime(0, 0, 0, $m, 1)),
-                'income' => $mIncome,
-                'expense' => $mExpense,
+                'income' => (float) ($monthlyIncomes[$m] ?? 0),
+                'expense' => (float) ($monthlyExpenses[$m] ?? 0),
             ];
         }
 
-        // Category breakdown
-        $incomeCategories = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->when($month, fn($q) => $q->whereMonth('date', $month))
-            ->when($year, fn($q) => $q->whereYear('date', $year))
-            ->selectRaw('category, sum(amount) as total')
+        // Category breakdown with index-friendly date filters
+        $incomeBreakdownQuery = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        $applyDateFilter($incomeBreakdownQuery);
+        $incomeCategories = $incomeBreakdownQuery
+            ->selectRaw('COALESCE(category, "অন্যান্য") as category, SUM(amount) as total')
             ->groupBy('category')
             ->get()
-            ->map(fn($item) => ['category' => $item->category, 'total' => (float)$item->total]);
+            ->map(fn($item) => ['category' => $item->category, 'total' => (float) $item->total]);
 
-        $expenseCategories = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->when($month, fn($q) => $q->whereMonth('date', $month))
-            ->when($year, fn($q) => $q->whereYear('date', $year))
-            ->selectRaw('category, sum(amount) as total')
+        $expenseBreakdownQuery = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        $applyDateFilter($expenseBreakdownQuery);
+        $expenseCategories = $expenseBreakdownQuery
+            ->selectRaw('COALESCE(category, "অন্যান্য") as category, SUM(amount) as total')
             ->groupBy('category')
             ->get()
-            ->map(fn($item) => ['category' => $item->category, 'total' => (float)$item->total]);
+            ->map(fn($item) => ['category' => $item->category, 'total' => (float) $item->total]);
 
         return response()->json([
             'status' => 'success',
@@ -323,15 +391,16 @@ class AccountingController extends Controller
 
     public function getCategories(Request $request)
     {
-        $incomeCategories = \App\Models\IncomeCategory::get();
-        $expenseCategories = \App\Models\ExpenseCategory::get();
+        $data = Cache::remember('accounting_categories', 3600, function () {
+            return [
+                'income' => \App\Models\IncomeCategory::orderBy('name')->get(),
+                'expense' => \App\Models\ExpenseCategory::orderBy('name')->get(),
+            ];
+        });
 
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'income' => $incomeCategories,
-                'expense' => $expenseCategories,
-            ],
+            'data' => $data,
         ]);
     }
 
@@ -349,6 +418,8 @@ class AccountingController extends Controller
             'name' => $request->name,
             'description' => $request->description,
         ]);
+
+        Cache::forget('accounting_categories');
 
         return response()->json([
             'status' => 'success',
@@ -372,6 +443,8 @@ class AccountingController extends Controller
             'name' => $request->name,
             'description' => $request->description,
         ]);
+
+        Cache::forget('accounting_categories');
 
         return response()->json([
             'status' => 'success',
@@ -397,9 +470,12 @@ class AccountingController extends Controller
 
         $category->delete();
 
+        Cache::forget('accounting_categories');
+
         return response()->json([
             'status' => 'success',
             'message' => 'ক্যাটাগরি মুছে ফেলা হয়েছে।',
+            'data' => null,
         ]);
     }
 }

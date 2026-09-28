@@ -26,16 +26,22 @@ class _AccountingLedgerScreenState extends State<AccountingLedgerScreen> with Si
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabChange);
     _scrollController.addListener(_onScroll);
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData(refresh: true);
+    });
   }
 
   void _handleTabChange() {
-    if (_tabController.indexIsChanging) return;
     final types = ['all', 'income', 'expense'];
-    setState(() {
-      _currentType = types[_tabController.index];
-    });
-    _loadData();
+    if (_tabController.index >= 0 && _tabController.index < types.length) {
+      final selectedType = types[_tabController.index];
+      if (_currentType != selectedType && !_tabController.indexIsChanging) {
+        setState(() {
+          _currentType = selectedType;
+        });
+        _loadData(refresh: true);
+      }
+    }
   }
 
   void _onScroll() {
@@ -45,15 +51,15 @@ class _AccountingLedgerScreenState extends State<AccountingLedgerScreen> with Si
   }
 
   void _loadData({bool refresh = true}) {
-    Future.microtask(() {
-      context.read<AccountingProvider>().fetchTransactions(
-        month: _selectedMonth, 
-        year: _selectedYear, 
-        type: _currentType,
-        refresh: refresh,
-      );
-      context.read<AccountingProvider>().fetchCategories();
-    });
+    if (!mounted) return;
+    final provider = context.read<AccountingProvider>();
+    provider.fetchTransactions(
+      month: _selectedMonth, 
+      year: _selectedYear, 
+      type: _currentType,
+      refresh: refresh,
+    );
+    provider.fetchCategories();
   }
 
   @override
@@ -175,7 +181,10 @@ class _AccountingLedgerScreenState extends State<AccountingLedgerScreen> with Si
                     underline: const SizedBox(),
                     items: List.generate(12, (i) => DropdownMenuItem(value: i + 1, child: Text(months[i], style: const TextStyle(fontSize: 13)))),
                     onChanged: (v) {
-                      if (v != null) setState(() { _selectedMonth = v; _loadData(); });
+                      if (v != null) {
+                        setState(() { _selectedMonth = v; });
+                        _loadData(refresh: true);
+                      }
                     },
                   ),
                 ),
@@ -190,7 +199,10 @@ class _AccountingLedgerScreenState extends State<AccountingLedgerScreen> with Si
                   underline: const SizedBox(),
                   items: [2024, 2025, 2026].map((y) => DropdownMenuItem(value: y, child: Text(y.toString(), style: const TextStyle(fontSize: 13)))).toList(),
                   onChanged: (v) {
-                    if (v != null) setState(() { _selectedYear = v; _loadData(); });
+                    if (v != null) {
+                      setState(() { _selectedYear = v; });
+                      _loadData(refresh: true);
+                    }
                   },
                 ),
               ),

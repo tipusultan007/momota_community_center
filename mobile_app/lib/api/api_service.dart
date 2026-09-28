@@ -134,11 +134,11 @@ class ApiService {
   }
 
   // GET with Caching
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters, Options? options}) async {
     final cleanPath = _normalizePath(path);
     final cacheKey = await _generateCacheKey(cleanPath, queryParameters);
     try {
-      final response = await _dio.get(cleanPath, queryParameters: queryParameters);
+      final response = await _dio.get(cleanPath, queryParameters: queryParameters, options: options);
       isOnline.value = true;
       
       // Cache the successful response in both memory and SQLite

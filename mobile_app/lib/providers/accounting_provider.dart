@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import '../api/api_service.dart';
 import '../models/transaction.dart';
 
@@ -9,10 +10,13 @@ class AccountingProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _isMoreLoading = false;
   
-  // Pagination
+  // Pagination & Filter State
   int _currentPage = 1;
   int _lastPage = 1;
   String _currentType = 'all';
+  int? _selectedMonth;
+  int? _selectedYear;
+  int _fetchRequestId = 0;
 
   // Summary Stats
   double _totalIncome = 0;
@@ -29,6 +33,7 @@ class AccountingProvider with ChangeNotifier {
   double get netProfit => _netProfit;
   int get currentPage => _currentPage;
   bool get hasMore => _currentPage < _lastPage;
+  String get currentType => _currentType;
 
   static double _toDouble(dynamic value) {
     if (value == null) return 0.0;
@@ -38,95 +43,128 @@ class AccountingProvider with ChangeNotifier {
     return 0.0;
   }
 
-  Future<void> fetchTransactions({int? month, int? year, String type = 'all', bool refresh = true}) async {
-    _currentType = type;
-    final queryParams = {
-      'type': type,
-      'page': refresh ? 1 : _currentPage,
-      if (month != null) 'month': month,
-      if (year != null) 'year': year,
-    };
+  void _populateFromData(Map<String, dynamic> data, {required bool refresh}) {
+    _totalIncome = _toDouble(data['summary']?['total_income']);
+    _totalExpense = _toDouble(data['summary']?['total_expense']);
+    _netProfit = _toDouble(data['summary']?['net_profit']);
+
+    final pagination = data['pagination'];
+    _currentPage = pagination?['current_page'] ?? 1;
+    _lastPage = pagination?['last_page'] ?? 1;
+
+    final List txList = data['transactions'] ?? [];
+    final newTxs = txList.map((item) {
+      try {
+        return Transaction.fromJson(Map<String, dynamic>.from(item), item['type']?.toString());
+      } catch (_) {
+        return null;
+      }
+    }).whereType<Transaction>().toList();
 
     if (refresh) {
+      _transactions = newTxs;
+    } else {
+      _transactions.addAll(newTxs);
+    }
+  }
+
+  Future<void> fetchTransactions({int? month, int? year, String? type, bool refresh = true}) async {
+    final targetType = type ?? _currentType;
+    final isTypeChanged = _currentType != targetType;
+    _currentType = targetType;
+    if (month != null) _selectedMonth = month;
+    if (year != null) _selectedYear = year;
+
+    final requestId = ++_fetchRequestId;
+
+    final queryParams = {
+      'type': _currentType,
+      'page': refresh ? 1 : _currentPage,
+      if (_selectedMonth != null) 'month': _selectedMonth,
+      if (_selectedYear != null) 'year': _selectedYear,
+    };
+
+    if (refresh || isTypeChanged) {
       _currentPage = 1;
-      // Instant cache check if empty
-      if (_transactions.isEmpty) {
-        final cached = await ApiService.instance.getLocalCache('/accounting', queryParameters: queryParams);
-        if (cached != null && cached['data'] != null) {
-          final data = cached['data'];
-          _totalIncome = _toDouble(data['summary']?['total_income']);
-          _totalExpense = _toDouble(data['summary']?['total_expense']);
-          _netProfit = _toDouble(data['summary']?['net_profit']);
-          final List txList = data['transactions'] ?? [];
-          _transactions = txList.map((item) {
-            try {
-              return Transaction.fromJson(Map<String, dynamic>.from(item), item['type']?.toString());
-            } catch (_) {
-              return null;
-            }
-          }).whereType<Transaction>().toList();
-          _isLoading = false;
-          notifyListeners();
-        } else {
-          _isLoading = true;
-          notifyListeners();
-        }
-      }
+      _isLoading = true;
+      // Immediately clear transactions when tab or filter changes so old tab's data is never displayed
+      _transactions = [];
+      notifyListeners();
     } else {
       _isMoreLoading = true;
       notifyListeners();
     }
 
+    final isOnline = ApiService.instance.isOnline.value;
+
+    // Only load from local cache if OFFLINE
+    if (!isOnline && refresh) {
+      final cached = await ApiService.instance.getLocalCache('/accounting', queryParameters: queryParams);
+      if (requestId != _fetchRequestId) return;
+      if (cached != null && cached['data'] != null) {
+        _populateFromData(cached['data'], refresh: true);
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+    }
+
     try {
-      final response = await ApiService.instance.get('/accounting', queryParameters: queryParams);
-      if (response.statusCode == 200) {
+      final response = await ApiService.instance.get(
+        '/accounting',
+        queryParameters: queryParams,
+        options: Options(headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        }),
+      );
+
+      if (requestId != _fetchRequestId) return;
+
+      if (response.statusCode == 200 && response.data != null) {
         final data = response.data['data'];
-        
-        // Stats
-        _totalIncome = _toDouble(data['summary']?['total_income']);
-        _totalExpense = _toDouble(data['summary']?['total_expense']);
-        _netProfit = _toDouble(data['summary']?['net_profit']);
-
-        // Pagination info (may not exist for combined 'all' type)
-        final pagination = data['pagination'];
-        _currentPage = pagination?['current_page'] ?? 1;
-        _lastPage = pagination?['last_page'] ?? 1;
-
-        // Transactions
-        final List txList = data['transactions'] ?? [];
-        final newTxs = txList.map((item) {
-          try {
-            return Transaction.fromJson(Map<String, dynamic>.from(item), item['type']?.toString());
-          } catch (_) {
-            return null;
-          }
-        }).whereType<Transaction>().toList();
-        
-        if (refresh) {
-          _transactions = newTxs;
-        } else {
-          _transactions.addAll(newTxs);
+        if (data != null) {
+          _populateFromData(data, refresh: refresh);
         }
       }
     } catch (e) {
+      if (requestId != _fetchRequestId) return;
       debugPrint('Error fetching transactions: $e');
+      // If network call failed (offline error or timeout), fallback to local cache
+      if (refresh && _transactions.isEmpty) {
+        final cached = await ApiService.instance.getLocalCache('/accounting', queryParameters: queryParams);
+        if (requestId != _fetchRequestId) return;
+        if (cached != null && cached['data'] != null) {
+          _populateFromData(cached['data'], refresh: true);
+        }
+      }
     } finally {
-      _isLoading = false;
-      _isMoreLoading = false;
-      notifyListeners();
+      if (requestId == _fetchRequestId) {
+        _isLoading = false;
+        _isMoreLoading = false;
+        notifyListeners();
+      }
     }
   }
 
   Future<void> loadMore({int? month, int? year}) async {
     if (_isMoreLoading || !hasMore) return;
     _currentPage++;
-    await fetchTransactions(month: month, year: year, type: _currentType, refresh: false);
+    await fetchTransactions(
+      month: month ?? _selectedMonth,
+      year: year ?? _selectedYear,
+      type: _currentType,
+      refresh: false,
+    );
   }
 
-  Future<void> fetchCategories() async {
+  Future<void> fetchCategories({bool force = false}) async {
+    if (!force && _incomeCategories.isNotEmpty && _expenseCategories.isNotEmpty) {
+      return;
+    }
     try {
       final response = await ApiService.instance.get('/accounting/categories');
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data != null) {
         final data = response.data['data'];
         final List incomeList = data['income'] ?? [];
         final List expenseList = data['expense'] ?? [];
@@ -179,7 +217,7 @@ class AccountingProvider with ChangeNotifier {
           _netProfit = _totalIncome - _totalExpense;
           notifyListeners();
         } else {
-          await fetchTransactions();
+          await fetchTransactions(month: _selectedMonth, year: _selectedYear, type: _currentType, refresh: true);
         }
         return true;
       }
@@ -219,7 +257,7 @@ class AccountingProvider with ChangeNotifier {
             notifyListeners();
           }
         } else {
-          await fetchTransactions();
+          await fetchTransactions(month: _selectedMonth, year: _selectedYear, type: _currentType, refresh: true);
         }
         return true;
       }
@@ -244,6 +282,9 @@ class AccountingProvider with ChangeNotifier {
           }
           _netProfit = _totalIncome - _totalExpense;
           notifyListeners();
+        }
+        if (response.statusCode == 200) {
+          await fetchTransactions(month: _selectedMonth, year: _selectedYear, type: _currentType, refresh: true);
         }
         return true;
       }
@@ -276,7 +317,7 @@ class AccountingProvider with ChangeNotifier {
           }
           notifyListeners();
         } else {
-          await fetchCategories();
+          await fetchCategories(force: true);
         }
         return true;
       }

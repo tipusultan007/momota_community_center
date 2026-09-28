@@ -15,12 +15,14 @@ return new class extends Migration
         $columnNames = config('permission.column_names');
         $teamsKey = $columnNames['team_foreign_key'] ?? 'team_id';
 
-        if (Schema::hasColumn($tableNames['model_has_roles'], $teamsKey)) {
-            DB::statement("ALTER TABLE `{$tableNames['model_has_roles']}` MODIFY `{$teamsKey}` BIGINT UNSIGNED NOT NULL DEFAULT 0");
-        }
+        if (DB::getDriverName() === 'mysql') {
+            if (Schema::hasColumn($tableNames['model_has_roles'], $teamsKey)) {
+                DB::statement("ALTER TABLE `{$tableNames['model_has_roles']}` MODIFY `{$teamsKey}` BIGINT UNSIGNED NOT NULL DEFAULT 0");
+            }
 
-        if (Schema::hasColumn($tableNames['model_has_permissions'], $teamsKey)) {
-            DB::statement("ALTER TABLE `{$tableNames['model_has_permissions']}` MODIFY `{$teamsKey}` BIGINT UNSIGNED NOT NULL DEFAULT 0");
+            if (Schema::hasColumn($tableNames['model_has_permissions'], $teamsKey)) {
+                DB::statement("ALTER TABLE `{$tableNames['model_has_permissions']}` MODIFY `{$teamsKey}` BIGINT UNSIGNED NOT NULL DEFAULT 0");
+            }
         }
     }
 

@@ -16,20 +16,20 @@ class DashboardController extends Controller
     {
         $hallId = $request->header('X-Hall-Id');
 
-        // Stats for the current month
+        // Stats for the current month with index-friendly date ranges
+        $startOfMonth = now()->startOfMonth()->toDateString();
+        $endOfMonth = now()->endOfMonth()->toDateString();
+
         $totalIncome = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->whereYear('date', now()->year)
-            ->whereMonth('date', now()->month)
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
         $totalExpense = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->whereYear('date', now()->year)
-            ->whereMonth('date', now()->month)
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
             ->sum('amount');
 
         $totalBookings = Booking::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
             ->count();
 
         // Recent Bookings (for the slider)
