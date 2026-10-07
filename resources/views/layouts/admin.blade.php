@@ -24,6 +24,17 @@
     </script>
     <style>
         body, .sidebar-nav, .header, .card, .btn { font-family: 'Anek Bangla','Inter',sans-serif; }
+
+        /* Custom Color Utilities: Amber & Azure */
+        .text-amber { color: #d97706 !important; }
+        .bg-amber { background-color: #f59e0b !important; color: #ffffff !important; }
+        .bg-amber-lt { color: #b45309 !important; background-color: rgba(245, 158, 11, 0.12) !important; }
+        .border-amber { border-color: #f59e0b !important; }
+
+        .text-azure { color: #4299e1 !important; }
+        .bg-azure { background-color: #4299e1 !important; color: #ffffff !important; }
+        .bg-azure-lt { color: #206bc4 !important; background-color: rgba(66, 153, 225, 0.12) !important; }
+        .border-azure { border-color: #4299e1 !important; }
     </style>
     @stack('css')
     @vite(['resources/css/app.css', 'resources/js/app.js'])

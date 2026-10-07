@@ -68,15 +68,22 @@ class AmountHelper
         return (string) $number;
     }
 
-    public static function toBengaliNumber($number, $decimals = 0)
+    public static function toBengaliNumber($number, $decimals = 0, $formatNumber = true)
     {
         $eng = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         $bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         
-        if (is_numeric($number)) {
+        if ($formatNumber && is_numeric($number)) {
             $number = number_format($number, $decimals, '.', ',');
         }
 
+        return str_replace($eng, $bn, (string)$number);
+    }
+
+    public static function toBengaliDigits($number)
+    {
+        $eng = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        $bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return str_replace($eng, $bn, (string)$number);
     }
 }

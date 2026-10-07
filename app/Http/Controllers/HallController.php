@@ -38,7 +38,7 @@ class HallController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:255',
             'capacity' => 'nullable|integer',
             'price_per_slot' => 'required|numeric',
         ]);
@@ -72,7 +72,7 @@ class HallController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:255',
             'capacity' => 'nullable|integer',
             'price_per_slot' => 'required|numeric',
         ]);

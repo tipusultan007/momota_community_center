@@ -21,6 +21,14 @@ return [
             'BI' => 'HindSiliguri-Bold.ttf',
             'useOTL' => 0xFF,
             'useKashida' => 75,
+        ],
+        'solaiman_lipi' => [
+            'R'  => 'SolaimanLipi.ttf',
+            'B'  => 'SolaimanLipi.ttf',
+            'I'  => 'SolaimanLipi.ttf',
+            'BI' => 'SolaimanLipi.ttf',
+            'useOTL' => 0xFF,
+            'useKashida' => 75,
         ]
     ]
 ];

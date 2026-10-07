@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BookingItem;
+use App\Models\WeddingDate;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -66,5 +67,91 @@ class CalendarController extends Controller
         });
 
         return response()->json($events);
+    }
+
+    /**
+     * Get auspicious Hindu wedding dates for the calendar range or month.
+     */
+    public function weddingDates(Request $request)
+    {
+        $start = $request->get('start') ? Carbon::parse($request->get('start'))->toDateString() : now()->startOfMonth()->toDateString();
+        $end = $request->get('end') ? Carbon::parse($request->get('end'))->toDateString() : now()->endOfMonth()->toDateString();
+
+        $weddingDates = WeddingDate::whereBetween('date', [$start, $end])
+            ->where('is_active', true)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $activeHallId = $request->header('X-Hall-Id') ?? $request->get('hall_id') ?? session('active_hall_id') ?? \App\Models\Hall::first()?->id;
+
+        $data = $weddingDates->map(function($wd) use ($activeHallId) {
+            $avail = $wd->getAvailabilityStatus($activeHallId);
+            $cDate = Carbon::parse($wd->date);
+            $bothBn = \App\Helpers\BanglaDateHelper::getBothDates($wd->date);
+
+            return [
+                'id' => $wd->id,
+                'date' => $cDate->format('Y-m-d'),
+                'day' => $cDate->format('d'),
+                'month_name' => $cDate->locale('bn')->translatedFormat('F'),
+                'day_name' => $cDate->locale('bn')->translatedFormat('l'),
+                'formatted_date' => $cDate->format('d M, Y'),
+                'title' => $wd->title,
+                'bengali_date' => $wd->bengali_date ?: $bothBn['panjika']['full'],
+                'bengali_date_academy' => $bothBn['academy']['full'],
+                'bengali_date_panjika' => $bothBn['panjika']['full'],
+                'tithi' => $wd->tithi,
+                'notes' => $wd->notes,
+                'availability' => $avail,
+                'create_booking_url' => route('bookings.create', ['date' => $cDate->format('Y-m-d')])
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    /**
+     * Store or update an auspicious wedding date.
+     */
+    public function storeWeddingDate(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'title' => 'nullable|string|max:255',
+            'bengali_date' => 'nullable|string|max:255',
+            'tithi' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        $weddingDate = WeddingDate::updateOrCreate(
+            ['date' => Carbon::parse($request->date)->format('Y-m-d')],
+            [
+                'title' => $request->title ?: 'শুভ বিবাহ লগ্ন',
+                'bengali_date' => $request->bengali_date,
+                'tithi' => $request->tithi ?: 'রাত্রিলগ্ন',
+                'notes' => $request->notes,
+                'is_active' => true,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'শুভ বিবাহের তারিখ সফলভাবে যুক্ত করা হয়েছে।',
+            'wedding_date' => $weddingDate
+        ]);
+    }
+
+    /**
+     * Delete an auspicious wedding date.
+     */
+    public function destroyWeddingDate($id)
+    {
+        $weddingDate = WeddingDate::findOrFail($id);
+        $weddingDate->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'শুভ বিবাহের তারিখ মুছে ফেলা হয়েছে।'
+        ]);
     }
 }

@@ -43,6 +43,9 @@ Route::middleware('auth')->group(function () {
             Route::middleware('can:manage-bookings')->group(function() {
                 Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
                 Route::get('calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
+                Route::get('calendar/wedding-dates', [CalendarController::class, 'weddingDates'])->name('calendar.wedding-dates');
+                Route::post('calendar/wedding-dates', [CalendarController::class, 'storeWeddingDate'])->name('calendar.wedding-dates.store');
+                Route::delete('calendar/wedding-dates/{id}', [CalendarController::class, 'destroyWeddingDate'])->name('calendar.wedding-dates.destroy');
                 Route::get('bookings/check-availability', [BookingController::class, 'checkAvailability'])->name('bookings.check-availability');
                 Route::resource('bookings', BookingController::class);
                 Route::get('bookings/{booking}/invoice', [BookingController::class, 'downloadInvoice'])->name('bookings.invoice');

@@ -1,4 +1,4 @@
-﻿<x-tabler-layout :title="'সেটিংস (হলের প্রোফাইল)'">
+<x-tabler-layout :title="'সেটিংস (হলের প্রোফাইল)'">
     <x-slot:header>
         <div class="page-header d-print-none">
             <div class="row g-2 align-items-center">
@@ -23,6 +23,25 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                        </div>
+                        <div>
+                            <h4 class="alert-title mb-1">তথ্য সংরক্ষণে ত্রুটি দেখা দিয়েছে:</h4>
+                            <ul class="mb-0 ps-3">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+            @endif
+
             <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row row-cards">
@@ -34,39 +53,46 @@
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label class="form-label required">নাম (নাম পরিবর্তন করলে ইনভয়েসেও পরিবর্তন হবে)</label>
-                                    <input type="text" name="name" class="form-control" value="{{ old('name', $hall->name) }}" required>
+                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $hall->name ?? $tenant->company_name) }}" required>
+                                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">ঠিকানা</label>
-                                    <input type="text" name="address" class="form-control" value="{{ old('address', $hall->address) }}" placeholder="হলের সঠিক ঠিকানা লিখুন">
+                                    <input type="text" name="address" class="form-control @error('address') is-invalid @enderror" value="{{ old('address', $hall->address ?? $tenant->address) }}" placeholder="হলের সঠিক ঠিকানা লিখুন">
+                                    @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">মোবাইল নম্বর</label>
-                                    <input type="text" name="phone" class="form-control" value="{{ old('phone', $hall->phone) }}" placeholder="01xxxxxxxxx">
+                                    <label class="form-label">মোবাইল নম্বর (একাধিক নম্বর কমা দিয়ে আলাদা করুন)</label>
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $hall->phone ?? $tenant->phone) }}" placeholder="০১xxxxxxxx, ০১xxxxxxxxx">
+                                    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label class="form-label required">হলের ধারণক্ষমতা (মেহমান)</label>
-                                            <input type="number" name="capacity" class="form-control" value="{{ old('capacity', $hall->capacity ?? 500) }}" required>
+                                            <input type="number" name="capacity" class="form-control @error('capacity') is-invalid @enderror" value="{{ old('capacity', $hall->capacity ?? 500) }}" required>
+                                            @error('capacity') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label class="form-label required">স্লট প্রতি ভাড়া (৳)</label>
-                                            <input type="number" name="price_per_slot" class="form-control" value="{{ old('price_per_slot', $hall->price_per_slot ?? 30000) }}" required>
+                                            <input type="number" step="any" name="price_per_slot" class="form-control @error('price_per_slot') is-invalid @enderror" value="{{ old('price_per_slot', $hall->price_per_slot ?? 30000) }}" required>
+                                            @error('price_per_slot') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label class="form-label required">জনপ্রতি পরিবেশনকারী রেট (৳)</label>
-                                            <input type="number" name="default_server_rate" class="form-control" value="{{ old('default_server_rate', $hall->default_server_rate ?? 500) }}" required>
+                                            <input type="number" step="any" name="default_server_rate" class="form-control @error('default_server_rate') is-invalid @enderror" value="{{ old('default_server_rate', $hall->default_server_rate ?? 500) }}" required>
+                                            @error('default_server_rate') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">ইনভয়েস শর্তাবলী (Terms & Conditions)</label>
-                                    <textarea name="invoice_conditions" class="form-control" rows="8" placeholder="প্রতিটি ইনভয়েসের নিচে এই শর্তাবলী দেখা যাবে">{{ old('invoice_conditions', $tenant->invoice_conditions) }}</textarea>
+                                    <textarea name="invoice_conditions" class="form-control @error('invoice_conditions') is-invalid @enderror" rows="8" placeholder="প্রতিটি ইনভয়েসের নিচে এই শর্তাবলী দেখা যাবে">{{ old('invoice_conditions', $tenant->invoice_conditions) }}</textarea>
+                                    @error('invoice_conditions') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     <small class="form-hint">প্রতিটি নতুন লাইন একটি বুলেট পয়েন্ট হিসেবে গণ্য হতে পারে।</small>
                                 </div>
                             </div>

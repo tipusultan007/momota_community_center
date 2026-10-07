@@ -83,6 +83,11 @@ Route::name('api.')->group(function () {
         Route::post('/commissions/{id}/collect', [CommissionController::class, 'collect']);
         Route::post('/commissions/{id}/pay-vendor', [CommissionController::class, 'payVendor']);
 
+        // Auspicious Hindu Wedding Dates (শুভ বিবাহের লগ্ন)
+        Route::get('/wedding-dates', [\App\Http\Controllers\CalendarController::class, 'weddingDates']);
+        Route::post('/wedding-dates', [\App\Http\Controllers\CalendarController::class, 'storeWeddingDate']);
+        Route::delete('/wedding-dates/{id}', [\App\Http\Controllers\CalendarController::class, 'destroyWeddingDate']);
+
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 });

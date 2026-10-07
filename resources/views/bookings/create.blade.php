@@ -95,27 +95,27 @@
                                                     <div class="mb-0">
                                                         <label class="form-label small">ইভেন্ট টাইপ</label>
                                                         <select :name="'items['+index+'][event_type]'" class="form-control" x-model="item.event_type" required>
-                                                            <option value="বিয়ে (Wedding Reception)">১. বিয়ে (Wedding Reception)</option>
-                                                            <option value="গায়ে হলুদ (Gaye Holud)">২. গায়ে হলুদ (Gaye Holud)</option>
-                                                            <option value="মেহেদি নাইট (Mehendi Night)">৩. মেহেদি নাইট (Mehendi Night)</option>
-                                                            <option value="আকদ / এনগেজমেন্ট (Akht / Engagement)">৪. আকদ / এনগেজমেন্ট (Akht / Engagement)</option>
-                                                            <option value="বৌভাত / ওয়ালিমা (Bou Bhat / Walima)">৫. বৌভাত / ওয়ালিমা (Bou Bhat / Walima)</option>
-                                                            <option value="জন্মদিন (Birthday Party)">৬. জন্মদিন (Birthday Party)</option>
-                                                            <option value="আকিকা (Aqiqa)">৭. আকিকা (Aqiqa)</option>
-                                                            <option value="বিবাহবার্ষিকী (Anniversary)">৮. বিবাহবার্ষিকী (Anniversary)</option>
-                                                            <option value="পারিবারিক পুনর্মিলনী (Family Reunion)">৯. পারিবারিক পুনর্মিলনী (Family Reunion)</option>
-                                                            <option value="কর্পোরেট এজিএম (AGM / Annual General Meeting)">১০. কর্পোরেট এজিএম (AGM / Annual General Meeting)</option>
-                                                            <option value="প্রডাক্ট লঞ্চ (Product Launch)">১১. প্রডাক্ট লঞ্চ (Product Launch)</option>
-                                                            <option value="কনফারেন্স ও সেমিনার (Conferences & Seminars)">১২. কনফারেন্স ও সেমিনার (Conferences & Seminars)</option>
-                                                            <option value="কর্পোরেট ডিনার ও গ্যালা নাইট (Corporate Dinner & Gala Night)">১৩. কর্পোরেট ডিনার ও গ্যালা নাইট (Corporate Dinner & Gala Night)</option>
-                                                            <option value="মেলা ও প্রদর্শনী (Trade Fairs & Exhibitions)">১৪. মেলা ও প্রদর্শনী (Trade Fairs & Exhibitions)</option>
-                                                            <option value="সমাবর্তন ও র্যাগ ডে (Graduation & Rag Day)">১৫. সমাবর্তন ও র্যাগ ডে (Graduation & Rag Day)</option>
-                                                            <option value="অ্যালামনাই রিইউনিয়ন (Alumni Reunion)">১৬. অ্যালামনাই রিইউনিয়ন (Alumni Reunion)</option>
-                                                            <option value="সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট (Cultural Shows & Concerts)">১৭. সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট (Cultural Shows & Concerts)</option>
-                                                            <option value="ইফতার মাহফিল (Iftar Mahfil)">১৮. ইফতার মাহফিল (Iftar Mahfil)</option>
-                                                            <option value="দোয়া ও মিলাদ মাহফিল (Prayer Gatherings)">১৯. দোয়া ও মিলাদ মাহফিল (Prayer Gatherings)</option>
-                                                            <option value="প্রেস কনফারেন্স ও মিটিং (Press Conferences)">২০. প্রেস কনফারেন্স ও মিটিং (Press Conferences)</option>
-                                                            <option value="অন্যান্য (Other)">অন্যান্য (Other)</option>
+                                                            <option value="বিয়ে">১. বিয়ে</option>
+                                                            <option value="গায়ে হলুদ ">২. গায়ে হলুদ </option>
+                                                            <option value="মেহেদি নাইট">৩. মেহেদি নাইট</option>
+                                                            <option value="আকদ / এনগেজমেন্ট">৪. আকদ / এনগেজমেন্ট</option>
+                                                            <option value="বৌভাত / ওয়ালিমা">৫. বৌভাত / ওয়ালিমা</option>
+                                                            <option value="জন্মদিন ">৬. জন্মদিন </option>
+                                                            <option value="আকিকা">৭. আকিকা </option>
+                                                            <option value="বিবাহবার্ষিকী">৮. বিবাহবার্ষিকী </option>
+                                                            <option value="পারিবারিক পুনর্মিলনী">৯. পারিবারিক পুনর্মিলনী </option>
+                                                            <option value="কর্পোরেট এজিএম ">১০. কর্পোরেট এজিএম </option>
+                                                            <option value="প্রডাক্ট লঞ্চ ">১১. প্রডাক্ট লঞ্চ</option>
+                                                            <option value="কনফারেন্স ও সেমিনার">১২. কনফারেন্স ও সেমিনার </option>
+                                                            <option value="কর্পোরেট ডিনার ও গ্যালা নাইট">১৩. কর্পোরেট ডিনার ও গ্যালা নাইট</option>
+                                                            <option value="মেলা ও প্রদর্শনী "> ১৪. মেলা ও প্রদর্শনী </option>
+                                                            <option value="সমাবর্তন ও র্যাগ ডে ">১৫. সমাবর্তন ও র্যাগ ডে </option>
+                                                            <option value="অ্যালামনাই রিইউনিয়ন">১৬. অ্যালামনাই রিইউনিয়ন</option>
+                                                            <option value="সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট">১৭. সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট </option>
+                                                            <option value="ইফতার মাহফিল"> ১৮. ইফতার মাহফিল </option>
+                                                            <option value="দোয়া ও মিলাদ মাহফিল">১৯. দোয়া ও মিলাদ মাহফিল </option>
+                                                            <option value="প্রেস কনফারেন্স ও মিটিং">২০. প্রেস কনফারেন্স ও মিটিং</option>
+                                                            <option value="অন্যান্য">অন্যান্য </option>
                                                         </select>
                                                     </div>
                                                 </td>

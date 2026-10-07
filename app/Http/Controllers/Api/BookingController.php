@@ -415,7 +415,7 @@ class BookingController extends Controller
             ->findOrFail($id);
 
         $pdf = Pdf::loadView('bookings.invoice', ['booking' => $booking], [], [
-            'default_font' => 'hind_siliguri'
+            'default_font' => 'solaiman_lipi'
         ]);
         return $pdf->download('invoice-' . $booking->id . '.pdf');
     }

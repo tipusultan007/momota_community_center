@@ -32,8 +32,8 @@ class TenantSettingsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
-            'phone' => 'nullable|string|max:20',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'phone' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             'invoice_conditions' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
             'price_per_slot' => 'required|numeric|min:0',
