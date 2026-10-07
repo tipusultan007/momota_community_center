@@ -418,6 +418,18 @@
                     new window.bootstrap.Dropdown(el);
                 });
             }
+
+            // Global safety: cleanup orphaned modal backdrops when modals close
+            document.addEventListener('hidden.bs.modal', function() {
+                setTimeout(function() {
+                    if (!document.querySelector('.modal.show')) {
+                        document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('padding-right');
+                    }
+                }, 150);
+            });
         });
     </script>
     @stack('js')

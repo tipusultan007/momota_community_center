@@ -56,6 +56,17 @@
         .momota-brand .bn { font-weight: 800; font-size: 1.35rem; line-height: 1; color: #fff; }
         .momota-brand .en { font-weight: 700; font-size: 9px; letter-spacing: .8px; color: #F5A623; }
         [x-cloak] { display: none !important; }
+
+        /* Custom Color Utilities: Amber & Azure */
+        .text-amber { color: #d97706 !important; }
+        .bg-amber { background-color: #f59e0b !important; color: #ffffff !important; }
+        .bg-amber-lt { background: rgba(245, 158, 11, .14) !important; color: #b45309 !important; }
+        .border-amber { border-color: #f59e0b !important; }
+
+        .text-azure { color: #0aa2c0 !important; }
+        .bg-azure { background-color: #0dcaf0 !important; color: #ffffff !important; }
+        .bg-azure-lt { background: rgba(13, 202, 240, .14) !important; color: #0aa2c0 !important; }
+        .border-azure { border-color: #0dcaf0 !important; }
     </style>
 
     @stack('css')
@@ -267,6 +278,59 @@
         } else {
             shimBootstrapDataAttrs();
         }
+
+        // Global safety: cleanup orphaned modal backdrops when CoreUI or Bootstrap modals close
+        function cleanupStrayModalBackdrops() {
+            if (!document.querySelector('.modal.show')) {
+                document.querySelectorAll('.modal-backdrop').forEach(function(el) {
+                    el.remove();
+                });
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+            }
+        }
+
+        document.addEventListener('hidden.coreui.modal', function() {
+            setTimeout(cleanupStrayModalBackdrops, 100);
+        });
+        document.addEventListener('hidden.bs.modal', function() {
+            setTimeout(cleanupStrayModalBackdrops, 100);
+        });
+
+        // Global helper to safely hide modals in CoreUI & Bootstrap without stuck backdrops
+        window.safelyHideModal = function(modalTarget) {
+            const modalEl = typeof modalTarget === 'string' ? document.getElementById(modalTarget) : modalTarget;
+            if (!modalEl) return;
+
+            try {
+                const ModalClass = window.coreui?.Modal || window.bootstrap?.Modal;
+                if (ModalClass) {
+                    const instance = ModalClass.getInstance(modalEl) || ModalClass.getOrCreateInstance(modalEl);
+                    if (instance) {
+                        instance.hide();
+                    }
+                }
+            } catch (e) {
+                console.warn('Modal hide failed:', e);
+            }
+
+            const dismissBtn = modalEl.querySelector('[data-coreui-dismiss="modal"], [data-bs-dismiss="modal"]');
+            if (dismissBtn) {
+                dismissBtn.click();
+            }
+
+            setTimeout(function() {
+                modalEl.classList.remove('show');
+                modalEl.style.display = 'none';
+                modalEl.setAttribute('aria-hidden', 'true');
+                cleanupStrayModalBackdrops();
+            }, 120);
+
+            setTimeout(cleanupStrayModalBackdrops, 150);
+            setTimeout(cleanupStrayModalBackdrops, 350);
+            setTimeout(cleanupStrayModalBackdrops, 500);
+        };
     })();
 </script>
 <script src="{{ asset('coreui/vendors/simplebar/js/simplebar.min.js') }}"></script>

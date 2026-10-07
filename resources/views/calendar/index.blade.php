@@ -161,7 +161,7 @@
                         <span class="btn btn-outline-info disabled" id="bn-today-display-box">
                             আজ: <span id="bn-today-display">...</span>
                         </span>
-                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addWeddingDateModal">
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-coreui-toggle="modal" data-bs-target="#addWeddingDateModal" data-coreui-target="#addWeddingDateModal">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                             + শুভ বিবাহের তারিখ যোগ করুন
                         </button>
@@ -262,7 +262,7 @@
                         </div>
                     </div>
                     <div class="card-actions ms-auto">
-                        <button type="button" class="btn btn-sm btn-warning btn-icon" data-bs-toggle="modal" data-bs-target="#addWeddingDateModal" title="নতুন শুভ বিবাহের তারিখ যোগ করুন">
+                        <button type="button" class="btn btn-sm btn-warning btn-icon" data-bs-toggle="modal" data-coreui-toggle="modal" data-bs-target="#addWeddingDateModal" data-coreui-target="#addWeddingDateModal" title="নতুন শুভ বিবাহের তারিখ যোগ করুন">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                         </button>
                     </div>
@@ -277,31 +277,31 @@
 
                 <div class="card-footer py-2 px-3 bg-light-subtle d-flex justify-content-between align-items-center small text-muted" id="sidebar-summary-footer">
                     <span id="sidebar-count-text">০টি লগ্ন</span>
-                    <button class="btn btn-xs btn-outline-warning" data-bs-toggle="modal" data-bs-target="#addWeddingDateModal">+ নতুন যোগ</button>
+                    <button class="btn btn-xs btn-outline-warning" data-bs-toggle="modal" data-coreui-toggle="modal" data-bs-target="#addWeddingDateModal" data-coreui-target="#addWeddingDateModal">+ নতুন যোগ</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Booking Detail Modal -->
-    <div class="modal modal-blur fade" id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">বুকিং বিস্তারিত</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" data-coreui-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modalContent"></div>
                 <div class="modal-footer">
                     <a href="#" id="viewBtn" class="btn btn-primary">বিস্তারিত দেখুন</a>
-                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">বন্ধ করুন</button>
+                    <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal" data-coreui-dismiss="modal">বন্ধ করুন</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Wedding Date Detail Modal -->
-    <div class="modal modal-blur fade" id="weddingDateDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="weddingDateDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-warning-subtle">
@@ -309,7 +309,7 @@
                         <span>💍</span>
                         <span id="wd-detail-title">শুভ বিবাহ লগ্ন</span>
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" data-coreui-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="wdDetailContent"></div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -319,7 +319,7 @@
                     </button>
                     <div>
                         <a href="#" id="wdBookNowBtn" class="btn btn-success">এই তারিখে বুকিং তৈরি করুন</a>
-                        <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">বন্ধ করুন</button>
+                        <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal" data-coreui-dismiss="modal">বন্ধ করুন</button>
                     </div>
                 </div>
             </div>
@@ -327,7 +327,7 @@
     </div>
 
     <!-- Add New Wedding Date Modal -->
-    <div class="modal modal-blur fade" id="addWeddingDateModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="addWeddingDateModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form id="addWeddingDateForm">
@@ -337,7 +337,7 @@
                             <span>💍</span>
                             <span>নতুন শুভ বিবাহের তারিখ যুক্ত করুন</span>
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" data-coreui-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -387,7 +387,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">বাতিল</button>
+                        <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal" data-coreui-dismiss="modal">বাতিল</button>
                         <button type="submit" class="btn btn-warning" id="submitWdBtn">সংরক্ষণ করুন</button>
                     </div>
                 </form>
@@ -585,7 +585,7 @@
                         <div class="mb-2" style="font-size: 1.8rem;">💍</div>
                         <div class="fw-bold">এই মাসে কোনো শুভ লগ্ন যুক্ত নেই</div>
                         <div class="small mt-1">পঞ্জিকা অনুযায়ী নতুন লগ্ন যুক্ত করতে নিচের বাটনে চাপ দিন।</div>
-                        <button class="btn btn-sm btn-outline-warning mt-3" data-bs-toggle="modal" data-bs-target="#addWeddingDateModal">
+                        <button class="btn btn-sm btn-outline-warning mt-3" data-bs-toggle="modal" data-coreui-toggle="modal" data-bs-target="#addWeddingDateModal" data-coreui-target="#addWeddingDateModal">
                             + শুভ বিবাহের তারিখ যোগ করুন
                         </button>
                     </div>
@@ -762,8 +762,16 @@
                     })
                     .then(res => res.json())
                     .then(result => {
-                        var modal = bootstrap.Modal.getInstance(document.getElementById('weddingDateDetailModal'));
-                        if (modal) modal.hide();
+                        safelyHideModal('weddingDateDetailModal');
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'মুছে ফেলা হয়েছে!',
+                                text: 'শুভ বিবাহের তারিখ সফলভাবে মুছে ফেলা হয়েছে।',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
 
                         // Reload dates
                         const currentStart = calendarInstance.view.activeStart.toISOString().split('T')[0];
@@ -774,8 +782,57 @@
                 }
             };
 
-            var modal = new bootstrap.Modal(document.getElementById('weddingDateDetailModal'));
-            modal.show();
+            const detailModalEl = document.getElementById('weddingDateDetailModal');
+            const ModalClass = window.coreui?.Modal || window.bootstrap?.Modal;
+            if (ModalClass) {
+                ModalClass.getOrCreateInstance(detailModalEl).show();
+            }
+        }
+
+        // Safe modal close helper to prevent stuck backdrops in CoreUI and Bootstrap
+        function safelyHideModal(modalId) {
+            const modalEl = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
+            if (!modalEl) return;
+
+            // 1. Try CoreUI / Bootstrap API
+            try {
+                const ModalClass = window.coreui?.Modal || window.bootstrap?.Modal;
+                if (ModalClass) {
+                    const inst = ModalClass.getInstance(modalEl) || ModalClass.getOrCreateInstance(modalEl);
+                    if (inst) {
+                        inst.hide();
+                    }
+                }
+            } catch (err) {
+                console.warn('Modal hide error:', err);
+            }
+
+            // 2. Click dismiss button as fallback
+            const dismissBtn = modalEl.querySelector('[data-coreui-dismiss="modal"], [data-bs-dismiss="modal"]');
+            if (dismissBtn) {
+                dismissBtn.click();
+            }
+
+            // 3. Fallback inline hide
+            setTimeout(() => {
+                modalEl.classList.remove('show');
+                modalEl.style.display = 'none';
+                modalEl.setAttribute('aria-hidden', 'true');
+            }, 100);
+
+            // 4. Force remove all stuck backdrops & restore body scroll
+            const forceCleanup = () => {
+                if (!document.querySelector('.modal.show')) {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('overflow');
+                    document.body.style.removeProperty('padding-right');
+                }
+            };
+
+            setTimeout(forceCleanup, 150);
+            setTimeout(forceCleanup, 350);
+            setTimeout(forceCleanup, 500);
         }
 
         // Submit form for adding wedding date
@@ -800,9 +857,18 @@
                 submitBtn.disabled = false;
                 submitBtn.innerText = 'সংরক্ষণ করুন';
                 if (data.success) {
-                    var modal = bootstrap.Modal.getInstance(document.getElementById('addWeddingDateModal'));
-                    if (modal) modal.hide();
+                    safelyHideModal('addWeddingDateModal');
                     document.getElementById('addWeddingDateForm').reset();
+
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'সফল!',
+                            text: 'শুভ বিবাহের তারিখ সফলভাবে যুক্ত হয়েছে।',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
 
                     // Reload dates in calendar and sidebar
                     const currentStart = calendarInstance.view.activeStart.toISOString().split('T')[0];
@@ -941,8 +1007,11 @@
                     document.getElementById('modalContent').innerHTML = content;
                     document.getElementById('viewBtn').href = "{{ url('bookings') }}/" + props.booking_id;
                     
-                    var modal = new bootstrap.Modal(document.getElementById('eventModal'));
-                    modal.show();
+                    const eventModalEl = document.getElementById('eventModal');
+                    const EventModalClass = window.coreui?.Modal || window.bootstrap?.Modal;
+                    if (EventModalClass) {
+                        EventModalClass.getOrCreateInstance(eventModalEl).show();
+                    }
                 }
             });
             calendarInstance.render();
