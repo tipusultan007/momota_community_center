@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\BusinessSetting;
-use App\Models\Hall;
+use App\Models\Booking;
 use App\Models\IncomeCategory;
 use App\Models\ExpenseCategory;
 use App\Models\Customer;
@@ -20,7 +20,6 @@ class ApiMobileAppTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-    protected Hall $hall;
 
     protected function setUp(): void
     {
@@ -33,18 +32,13 @@ class ApiMobileAppTest extends TestCase
                 'company_name' => 'গ্র্যান্ড প্যালেস কনভেনশন হল',
                 'phone' => '01711112222',
                 'address' => 'ঢাকা, বাংলাদেশ',
+                'capacity' => 800,
+                'price_per_slot' => 50000,
+                'default_server_rate' => 500,
             ]
         );
 
-        // 2. Setup Hall
-        $this->hall = Hall::create([
-            'name' => 'রয়েল ব্যাঙ্কোয়েট হল',
-            'capacity' => 800,
-            'price_per_slot' => 50000,
-            'is_active' => true,
-        ]);
-
-        // 3. Setup User
+        // 2. Setup User
         $this->user = User::factory()->create([
             'name' => 'ম্যানেজার',
             'email' => 'manager@test.com',
@@ -64,27 +58,85 @@ class ApiMobileAppTest extends TestCase
 
     public function test_api_dashboard(): void
     {
-        $response = $this->withHeader('X-Hall-Id', $this->hall->id)
-            ->getJson('/api/dashboard');
+        $response = $this->getJson('/api/dashboard');
         
         $response->assertStatus(200)
             ->assertJsonPath('status', 'success')
             ->assertJsonStructure([
                 'status',
                 'data' => [
-                    'stats' => ['total_income', 'total_expense', 'total_bookings', 'total_staff'],
+                    'stats' => [
+                        'total_income',
+                        'total_expense',
+                        'total_bookings',
+                        'total_staff',
+                        'active_staff',
+                        'total_customers',
+                        'today_events',
+                        'upcoming_events',
+                        'total_due',
+                        'month_booking_value',
+                        'collection_rate',
+                    ],
+                    'upcoming_bookings',
                     'recent_bookings',
                 ]
             ]);
     }
 
-    public function test_api_halls_list(): void
+    public function test_api_dashboard_includes_kpis_and_upcoming_events(): void
     {
-        $response = $this->getJson('/api/halls');
-        $response->assertStatus(200)
-            ->assertJsonPath('status', 'success');
-        
-        $this->assertNotEmpty($response->json('data'));
+        $customer = Customer::create([
+            'name' => 'আসন্ন ইভেন্ট গ্রাহক',
+            'phone' => '01900000000',
+        ]);
+
+        $booking = Booking::create([
+            'customer_id' => $customer->id,
+            'total_amount' => 60000,
+            'advance_amount' => 10000,
+            'status' => 'confirmed',
+        ]);
+
+        $booking->items()->create([
+            'event_date' => now()->addDays(3)->toDateString(),
+            'slot' => 'day',
+            'event_type' => 'বিয়ে',
+            'guest_count' => 200,
+            'sub_total' => 60000,
+        ]);
+
+        $this->getJson('/api/dashboard')
+            ->assertOk()
+            ->assertJsonPath('data.stats.total_customers', 1)
+            ->assertJsonPath('data.stats.today_events', 0)
+            ->assertJsonPath('data.stats.upcoming_events', 1)
+            ->assertJsonPath('data.stats.total_due', 50000)
+            ->assertJsonPath('data.upcoming_bookings.0.id', $booking->id);
+    }
+
+    public function test_api_tenant_settings_update(): void
+    {
+        $response = $this->postJson('/api/tenant/settings', [
+            'name' => 'মমতা কমিউনিটি সেন্টার',
+            'address' => 'মিরপুর, ঢাকা',
+            'phone' => '01700000000',
+            'invoice_conditions' => 'সম্পূর্ণ বিল আগে পরিশোধ করতে হবে।',
+            'capacity' => 500,
+            'price_per_slot' => 35000,
+            'default_server_rate' => 600,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.name', 'মমতা কমিউনিটি সেন্টার')
+            ->assertJsonPath('data.capacity', 500);
+
+        $this->assertDatabaseHas('business_settings', [
+            'company_name' => 'মমতা কমিউনিটি সেন্টার',
+            'capacity' => 500,
+            'price_per_slot' => 35000,
+            'default_server_rate' => 600,
+        ]);
     }
 
     public function test_api_customers_crud(): void
@@ -116,7 +168,6 @@ class ApiMobileAppTest extends TestCase
     {
         // 1. Check availability for free slot
         $availRes = $this->getJson('/api/bookings/check-availability?' . http_build_query([
-            'hall_id' => $this->hall->id,
             'event_date' => '2026-12-15',
             'slot' => 'day',
         ]));
@@ -132,7 +183,6 @@ class ApiMobileAppTest extends TestCase
             'advance_amount' => 10000,
             'items' => [
                 [
-                    'hall_id' => $this->hall->id,
                     'event_date' => '2026-12-15',
                     'slot' => 'day',
                     'base_price' => 50000,
@@ -147,7 +197,6 @@ class ApiMobileAppTest extends TestCase
 
         // 3. Check availability again for the same slot (must be booked now)
         $conflictCheck = $this->getJson('/api/bookings/check-availability?' . http_build_query([
-            'hall_id' => $this->hall->id,
             'event_date' => '2026-12-15',
             'slot' => 'day',
         ]));
@@ -156,7 +205,6 @@ class ApiMobileAppTest extends TestCase
 
         // 4. Night slot on the same date should still be free
         $nightCheck = $this->getJson('/api/bookings/check-availability?' . http_build_query([
-            'hall_id' => $this->hall->id,
             'event_date' => '2026-12-15',
             'slot' => 'night',
         ]));
@@ -170,7 +218,6 @@ class ApiMobileAppTest extends TestCase
             'total_amount' => 50000,
             'items' => [
                 [
-                    'hall_id' => $this->hall->id,
                     'event_date' => '2026-12-15',
                     'slot' => 'day',
                     'base_price' => 50000,
@@ -212,7 +259,6 @@ class ApiMobileAppTest extends TestCase
             'amount' => 25000,
             'date' => '2026-10-01',
             'income_category_id' => $inCat->id,
-            'hall_id' => $this->hall->id,
             'description' => 'হল বুকিং ফি',
         ]);
         $inRes->assertStatus(201)
@@ -223,7 +269,6 @@ class ApiMobileAppTest extends TestCase
             'amount' => 5000,
             'date' => '2026-10-02',
             'expense_category_id' => $exCat->id,
-            'hall_id' => $this->hall->id,
             'description' => 'অক্টোবর বিদ্যুৎ বিল',
         ]);
         $exRes->assertStatus(201)

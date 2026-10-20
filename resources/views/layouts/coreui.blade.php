@@ -188,8 +188,7 @@
             </button>
             <div class="header-nav ms-auto">
                 <span class="text-body-secondary small d-none d-md-inline">
-                    {{ $businessSetting?->business_name ?? config('app.name') }}
-                    @isset($activeHall) — {{ $activeHall->name ?? '' }} @endisset
+                    {{ $businessSetting?->company_name ?? config('app.name') }}
                 </span>
             </div>
             <ul class="header-nav">

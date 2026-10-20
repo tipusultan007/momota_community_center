@@ -5,7 +5,6 @@ import 'providers/booking_provider.dart';
 import 'providers/customer_provider.dart';
 import 'providers/accounting_provider.dart';
 import 'providers/staff_provider.dart';
-import 'providers/hall_provider.dart';
 import 'providers/dashboard_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/report_provider.dart';
@@ -49,7 +48,6 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()..checkAuth()),
-        ChangeNotifierProvider(create: (_) => HallProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()),
         ChangeNotifierProvider(create: (_) => AccountingProvider()),

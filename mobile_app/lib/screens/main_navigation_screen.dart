@@ -7,7 +7,6 @@ import 'calendar/calendar_screen.dart';
 import 'accounting/accounting_ledger_screen.dart';
 import 'customers/customer_list_screen.dart';
 import 'staff/staff_list_screen.dart';
-import '../providers/hall_provider.dart';
 import '../providers/booking_provider.dart';
 import '../providers/accounting_provider.dart';
 import '../providers/customer_provider.dart';
@@ -19,6 +18,7 @@ import 'staff/salary_list_screen.dart';
 import 'users/user_list_screen.dart';
 import 'reports/report_selection_screen.dart';
 import 'accounting/category_list_screen.dart';
+import 'loans/loan_list_screen.dart';
 import 'settings/business_settings_screen.dart';
 import 'settings/change_password_screen.dart';
 import 'vendors/vendor_list_screen.dart';
@@ -103,9 +103,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     };
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshAllData();
-      final hallProvider = context.read<HallProvider>();
-      hallProvider.addListener(_onHallChanged);
-      hallProvider.fetchHalls();
     });
   }
 
@@ -119,15 +116,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && mounted) {
       _refreshAllData();
-    }
-  }
-
-  void _onHallChanged() {
-    if (mounted) {
-      final hallProvider = context.read<HallProvider>();
-      if (!hallProvider.isLoading) {
-        _refreshAllData();
-      }
     }
   }
 
@@ -384,6 +372,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
                   'হিসাব রক্ষণ',
                   [
                     _drawerSubItem('লেনদেন বিবরণী', 2),
+                    _drawerSubItem('হাওলাত / ঋণ (ধার-দেনা)', -1, screen: const LoanListScreen()),
                     _drawerSubItem('আয়/ব্যয় ক্যাটেগরি', -1, screen: const CategoryListScreen()),
                   ]
                 ),

@@ -9,7 +9,6 @@ import '../../models/booking_item.dart';
 import '../../models/wedding_date.dart';
 import '../../api/api_service.dart';
 import '../../theme/app_theme.dart';
-import '../../utils/bangla_date_helper.dart';
 import '../bookings/booking_details_screen.dart';
 import '../bookings/booking_form_screen.dart';
 
@@ -217,10 +216,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _buildMonthNavigatorBar(int monthlyCount) {
     final engMonth = DateFormat('MMMM yyyy').format(_focusedDay);
     final bnMonth = '${_getBanglaMonthName(_focusedDay.month)} ${_focusedDay.year}';
-    final dualDates = BanglaDateHelper.getBothDates(_focusedDay);
-    final String bnSub = dualDates.academy.month == dualDates.panjika.month
-        ? '${dualDates.academy.month} ${dualDates.academy.year}'
-        : '${dualDates.academy.month} (বিশুদ্ধ সিদ্ধান্ত: ${dualDates.panjika.month})';
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 6),
@@ -261,8 +256,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '$engMonth • $bnSub',
-                    style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+                    engMonth,
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(width: 8),
                   Container(
@@ -501,29 +496,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Text(
                   '${day.day}',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: (isSelected || isToday || isBooked || isWeddingDate)
                         ? FontWeight.bold
-                        : FontWeight.w500,
+                        : FontWeight.w600,
                     color: textColor,
                   ),
                 ),
-                Builder(
-                  builder: (context) {
-                    final dualBn = BanglaDateHelper.getBothDates(day);
-                    return Text(
-                      'বা:${dualBn.academy.day} বি:${dualBn.panjika.day}',
-                      style: TextStyle(
-                        fontSize: 7.5,
-                        fontWeight: (isWeddingDate || isSelected) ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected
-                            ? Colors.white.withAlpha(220)
-                            : (isWeddingDate ? const Color(0xFFB45309) : Colors.grey.shade600),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 1),
+                const SizedBox(height: 2),
                 // Booking indicator dots
                 if (isBooked)
                   Row(
@@ -887,58 +867,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 3),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 2,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          if (wd.bengaliDatePanjika != null && wd.bengaliDatePanjika!.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEF3C7),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: const Color(0xFFF59E0B), width: 0.7),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text('বি ', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold, color: Color(0xFF92400E))),
-                                  Text(
-                                    wd.bengaliDatePanjika!,
-                                    style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF92400E)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (wd.bengaliDateAcademy != null && wd.bengaliDateAcademy!.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: Colors.grey.shade300, width: 0.7),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('বা ', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
-                                  Text(
-                                    wd.bengaliDateAcademy!,
-                                    style: TextStyle(fontSize: 10.5, color: Colors.grey.shade800),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      if (wd.tithi != null && wd.tithi!.isNotEmpty)
+                      if (wd.tithi != null && wd.tithi!.isNotEmpty) ...[
+                        const SizedBox(height: 3),
                         Text(
                           'লগ্ন: ${wd.tithi!}',
-                          style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
+                          style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
                         ),
+                      ],
                     ],
                   ),
                 ),
@@ -989,7 +924,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final navigator = Navigator.of(context);
     DateTime selectedDate = _selectedDay;
     final titleController = TextEditingController(text: 'শুভ বিবাহ লগ্ন');
-    final bengaliDateController = TextEditingController();
     final tithiController = TextEditingController(text: 'রাত্রিলগ্ন');
     final notesController = TextEditingController();
     bool isSubmitting = false;
@@ -1042,7 +976,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ),
                               ),
                               Text(
-                                'পঞ্জিকা অনুসারে বিবাহের তারিখ যুক্ত করুন',
+                                'বিবাহের শুভ লগ্ন ও তারিখ যুক্ত করুন',
                                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                               ),
                             ],
@@ -1070,8 +1004,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         if (picked != null) {
                           setModalState(() {
                             selectedDate = picked;
-                            final dual = BanglaDateHelper.getBothDates(picked);
-                            bengaliDateController.text = dual.panjika.full;
                           });
                         }
                       },
@@ -1100,50 +1032,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                       ),
                     ),
-                    // Dual Bangla Date Preview Box
-                    Builder(
-                      builder: (context) {
-                        final dualBn = BanglaDateHelper.getBothDates(selectedDate);
-                        if (bengaliDateController.text.isEmpty) {
-                          bengaliDateController.text = dualBn.panjika.full;
-                        }
-                        return Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFFBEB),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFFDE68A)),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('বি বিশুদ্ধ সিদ্ধান্ত (প্রোকেরালা):', style: TextStyle(fontSize: 10, color: Color(0xFF92400E), fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 2),
-                                    Text(dualBn.panjika.full, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFB45309))),
-                                  ],
-                                ),
-                              ),
-                              Container(height: 26, width: 1, color: const Color(0xFFFDE68A)),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('বা বাংলা একাডেমি (সরকারি):', style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 2),
-                                    Text(dualBn.academy.full, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade800)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
                     const SizedBox(height: 14),
 
                     // Title
@@ -1156,53 +1044,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Bengali Date
-                    Text('বাংলা সন ও তারিখ (ঐচ্ছিক)', style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.textNavy)),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: bengaliDateController,
-                      decoration: InputDecoration(
-                        hintText: 'যেমন: ২৮ আশ্বিন, ১৪৩৩ বা ৬ কার্তিক',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    // Quick choose chips
-                    Builder(
-                      builder: (context) {
-                        final dualBn = BanglaDateHelper.getBothDates(selectedDate);
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Wrap(
-                            spacing: 8,
-                            children: [
-                              ActionChip(
-                                label: Text('বিশুদ্ধ সিদ্ধান্ত: ${dualBn.panjika.full}', style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF92400E))),
-                                backgroundColor: const Color(0xFFFEF3C7),
-                                side: const BorderSide(color: Color(0xFFF59E0B), width: 0.8),
-                                onPressed: () {
-                                  setModalState(() {
-                                    bengaliDateController.text = dualBn.panjika.full;
-                                  });
-                                },
-                              ),
-                              ActionChip(
-                                label: Text('একাডেমি: ${dualBn.academy.full}', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade800)),
-                                backgroundColor: Colors.grey.shade100,
-                                side: BorderSide(color: Colors.grey.shade300, width: 0.8),
-                                onPressed: () {
-                                  setModalState(() {
-                                    bengaliDateController.text = dualBn.academy.full;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
                     ),
                     const SizedBox(height: 14),
 
@@ -1266,7 +1107,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     data: {
                                       'date': dateStr,
                                       'title': titleController.text.trim().isEmpty ? 'শুভ বিবাহ লগ্ন' : titleController.text.trim(),
-                                      'bengali_date': bengaliDateController.text.trim().isEmpty ? null : bengaliDateController.text.trim(),
                                       'tithi': tithiController.text.trim().isEmpty ? 'রাত্রিলগ্ন' : tithiController.text.trim(),
                                       'notes': notesController.text.trim().isEmpty ? null : notesController.text.trim(),
                                     },
@@ -1407,27 +1247,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           'শুভ বিবাহ লগ্ন: ${selectedWeddingDate.title}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF92400E)),
                         ),
-                        Wrap(
-                          spacing: 6,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            if (selectedWeddingDate.bengaliDatePanjika != null)
-                              Text(
-                                'বি: ${selectedWeddingDate.bengaliDatePanjika}',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFB45309)),
-                              ),
-                            if (selectedWeddingDate.bengaliDateAcademy != null)
-                              Text(
-                                'বা: ${selectedWeddingDate.bengaliDateAcademy}',
-                                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade800),
-                              ),
-                            if (selectedWeddingDate.tithi != null && selectedWeddingDate.tithi!.isNotEmpty)
-                              Text(
-                                '(${selectedWeddingDate.tithi})',
-                                style: const TextStyle(fontSize: 10.5, color: Color(0xFF92400E)),
-                              ),
-                          ],
-                        ),
+                        if (selectedWeddingDate.tithi != null && selectedWeddingDate.tithi!.isNotEmpty)
+                          Text(
+                            'লগ্ন: ${selectedWeddingDate.tithi}',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
+                          ),
                       ],
                     ),
                   ),
@@ -1474,16 +1298,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           color: AppTheme.textNavy,
                         ),
                       ),
-                      Builder(builder: (context) {
-                        final dual = BanglaDateHelper.getBothDates(_selectedDay);
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Text(
-                            'বা: ${dual.academy.full}  |  বি: ${dual.panjika.full}',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF92400E)),
-                          ),
-                        );
-                      }),
+                      const SizedBox(height: 2),
                       Text(
                         selectedEvents.isEmpty
                             ? 'এই দিনে কোনো বুকিং নেই'

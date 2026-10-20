@@ -6,7 +6,6 @@ class Transaction {
   final double amount;
   final String date;
   final String? description;
-  final int? hallId;
   final int? bookingId;
 
   Transaction({
@@ -17,7 +16,6 @@ class Transaction {
     required this.amount,
     required this.date,
     this.description,
-    this.hallId,
     this.bookingId,
   });
 
@@ -46,7 +44,6 @@ class Transaction {
       amount: _toDouble(json['amount']),
       date: json['date']?.toString() ?? 'N/A',
       description: json['description']?.toString(),
-      hallId: int.tryParse(json['hall_id']?.toString() ?? ''),
       bookingId: int.tryParse(json['booking_id']?.toString() ?? ''),
     );
   }

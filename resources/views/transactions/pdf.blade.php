@@ -117,6 +117,10 @@
                                 বেতন
                             @elseif($transaction->type == 'commission')
                                 কমিশন
+                            @elseif($transaction->type == 'loan_taken')
+                                হাওলাত গ্রহণ
+                            @elseif($transaction->type == 'loan_repayment')
+                                হাওলাত পরিশোধ
                             @endif
                         </td>
                         <td>
@@ -126,14 +130,14 @@
                             @endif
                         </td>
                         <td class="text-right">
-                            @if($transaction->type == 'income')
+                            @if(in_array($transaction->type, ['income', 'loan_taken']))
                                 {{ number_format($transaction->amount, 0) }}
                             @else
                                 -
                             @endif
                         </td>
                         <td class="text-right">
-                            @if(in_array($transaction->type, ['expense', 'salary', 'commission']))
+                            @if(in_array($transaction->type, ['expense', 'salary', 'commission', 'loan_repayment']))
                                 {{ number_format($transaction->amount, 0) }}
                             @else
                                 -

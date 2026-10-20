@@ -215,7 +215,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="fw-semibold">{{ $ub->hall?->name ?? '—' }}</div>
+                                                <div class="fw-semibold">{{ $ub->event_type ?? '—' }}</div>
                                                 <span class="badge {{ $slotBadge }} mt-1">{{ $slotLabel }}</span>
                                             </td>
                                             <td>

@@ -69,7 +69,7 @@ class ReportController extends Controller
         $bookingsTotalValue = Booking::whereBetween('created_at', [$startDate, $endDate])->sum('total_amount');
         $netProfit = $totalIncome - $totalExpense;
 
-        // Fetch Hall Details
+        // Fetch venue details
         $tenant = \App\Models\BusinessSetting::get();
 
         $toBengali = fn($number) => $this->toBengali($number);

@@ -39,7 +39,6 @@ class IncomeObserver
                 'transactionable_type' => Income::class,
             ],
             [
-                'hall_id' => $income->hall_id,
                 'type' => 'income',
                 'amount' => $income->amount,
                 'date' => $income->date ?? $income->created_at,

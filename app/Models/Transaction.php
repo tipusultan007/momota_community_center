@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
-use App\Traits\BelongsToHall;
 use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    use BelongsToTenant, BelongsToHall;
+    use BelongsToTenant;
 
     protected $fillable = [
-        'hall_id',
         'transactionable_type',
         'transactionable_id',
         'type',

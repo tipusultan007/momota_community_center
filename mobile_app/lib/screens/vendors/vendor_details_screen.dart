@@ -184,7 +184,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> with SingleTi
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             title: Text(item['customer_name'] ?? 'Guest', style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('${item['event_date']} | ${item['hall_name']}'),
+            subtitle: Text('${item['event_date']} | ${item['event_type'] ?? 'ইভেন্ট'}'),
             trailing: Text('৳${item['total_price']}', style: const TextStyle(fontWeight: FontWeight.w900, color: AppTheme.textNavy)),
           ),
         );

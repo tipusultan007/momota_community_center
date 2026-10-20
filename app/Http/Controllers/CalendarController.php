@@ -11,7 +11,7 @@ class CalendarController extends Controller
 {
     public function index()
     {
-        $upcomingBookings = BookingItem::with(['booking.customer', 'hall'])
+        $upcomingBookings = BookingItem::with(['booking.customer'])
             ->whereHas('booking.customer')
             ->where('event_date', '>=', now())
             ->orderBy('event_date', 'asc')
@@ -25,8 +25,9 @@ class CalendarController extends Controller
     {
         $start = $request->get('start');
         $end = $request->get('end');
+        $businessName = \App\Models\BusinessSetting::get()->name;
 
-        $items = BookingItem::with(['booking.customer', 'hall'])
+        $items = BookingItem::with(['booking.customer'])
             ->whereHas('booking.customer')
             ->whereBetween('event_date', [
                 Carbon::parse($start)->toDateString(),
@@ -37,7 +38,7 @@ class CalendarController extends Controller
             })
             ->get();
 
-        $events = $items->map(function($item) {
+        $events = $items->map(function($item) use ($businessName) {
             $color = '#206bc4'; // default blue
             if ($item->slot === 'day' || $item->slot === 'morning') $color = '#4299e1';
             if ($item->slot === 'night' || $item->slot === 'evening') $color = '#4c51bf';
@@ -52,7 +53,7 @@ class CalendarController extends Controller
                 'extendedProps' => [
                     'customer' => $item->booking->customer->name,
                     'phone' => $item->booking->customer->phone,
-                    'hall' => $item->hall?->name ?? 'মমতা কমিউনিটি সেন্টার',
+                    'venue' => $businessName,
                     'slot' => $item->slot,
                     'event_type' => $item->event_type,
                     'guest_count' => $item->guest_count,
@@ -82,10 +83,8 @@ class CalendarController extends Controller
             ->orderBy('date', 'asc')
             ->get();
 
-        $activeHallId = $request->header('X-Hall-Id') ?? $request->get('hall_id') ?? session('active_hall_id') ?? \App\Models\Hall::first()?->id;
-
-        $data = $weddingDates->map(function($wd) use ($activeHallId) {
-            $avail = $wd->getAvailabilityStatus($activeHallId);
+        $data = $weddingDates->map(function($wd) {
+            $avail = $wd->getAvailabilityStatus();
             $cDate = Carbon::parse($wd->date);
             $bothBn = \App\Helpers\BanglaDateHelper::getBothDates($wd->date);
 

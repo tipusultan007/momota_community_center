@@ -77,40 +77,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        return \DB::transaction(function () use ($request) {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => Hash::make($request->password),
-            ]);
-
-            $user->assignRole('Admin');
-
-            $token = $user->createToken('Mobile App')->plainTextToken;
-
-            return response()->json([
-                'status' => 'success',
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'tenant_id' => 1,
-                ],
-            ], 201);
-        });
-    }
-
     public function profile(Request $request)
     {
         $user = $request->user();
@@ -177,9 +143,20 @@ class AuthController extends Controller
             'address' => 'required|string',
             'phone' => 'required|string',
             'invoice_conditions' => 'nullable|string',
+            'capacity' => 'nullable|integer|min:1',
+            'price_per_slot' => 'nullable|numeric|min:0',
+            'default_server_rate' => 'nullable|numeric|min:0',
         ]);
 
-        $tenant->update($request->only('name', 'address', 'phone', 'invoice_conditions'));
+        $tenant->update([
+            'company_name' => $request->name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'invoice_conditions' => $request->invoice_conditions,
+            'capacity' => $request->input('capacity', $tenant->capacity),
+            'price_per_slot' => $request->input('price_per_slot', $tenant->price_per_slot),
+            'default_server_rate' => $request->input('default_server_rate', $tenant->default_server_rate),
+        ]);
 
         return response()->json([
             'status' => 'success',

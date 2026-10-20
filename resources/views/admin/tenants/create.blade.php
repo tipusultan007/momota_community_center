@@ -60,8 +60,8 @@
                             <div class="col-md-5">
                                 <label class="form-label required">ইউনিক স্ল্যাগ (URL Slug)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light text-muted small">/hall/</span>
-                                    <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug') }}" required placeholder="royal-grand" id="tenantSlug">
+                                    <span class="input-group-text bg-light text-muted small">/venue/</span>
+                                    <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug') }}" required placeholder="royal-venue" id="tenantSlug">
                                 </div>
                                 <small class="form-hint">ইউনিক ইংরেজি ছোট অক্ষরের স্ল্যাগ।</small>
                                 @error('slug')
@@ -115,10 +115,6 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">সর্বোচ্চ হল লিমিট</label>
-                                <input type="number" name="hall_limit" min="1" max="100" class="form-control" value="{{ old('hall_limit', 5) }}">
-                            </div>
                             <div class="col-md-6">
                                 <label class="form-label">সর্বোচ্চ স্টাফ লিমিট</label>
                                 <input type="number" name="staff_limit" min="1" max="500" class="form-control" value="{{ old('staff_limit', 10) }}">

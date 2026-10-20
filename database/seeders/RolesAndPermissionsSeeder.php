@@ -20,7 +20,6 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // 1. Create global permissions
         $permissions = [
-            'manage-halls',
             'manage-bookings',
             'manage-financials',
             'manage-employees',
@@ -31,14 +30,14 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
-        // 2. Create global roles (team_id = null)
-        $admin = Role::firstOrCreate(['name' => 'Tenant Admin', 'team_id' => null, 'guard_name' => 'web']);
+        // 2. Create roles
+        $admin = Role::firstOrCreate(['name' => 'Tenant Admin', 'guard_name' => 'web']);
         $admin->syncPermissions(Permission::all());
 
-        $manager = Role::firstOrCreate(['name' => 'Manager', 'team_id' => null, 'guard_name' => 'web']);
-        $manager->syncPermissions(['manage-halls', 'manage-bookings', 'manage-financials']);
+        $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'web']);
+        $manager->syncPermissions(['manage-bookings', 'manage-financials']);
 
-        $staff = Role::firstOrCreate(['name' => 'Staff', 'team_id' => null, 'guard_name' => 'web']);
+        $staff = Role::firstOrCreate(['name' => 'Staff', 'guard_name' => 'web']);
         $staff->syncPermissions(['manage-bookings']);
     }
 }

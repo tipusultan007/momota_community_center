@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AccountingController;
-use App\Http\Controllers\Api\HallController;
 use App\Http\Controllers\Api\StaffController;
 use App\Http\Controllers\Api\SuperadminController;
 use App\Http\Controllers\Api\UserController;
@@ -17,10 +16,9 @@ use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\SubscriptionController;
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
-Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:6,1');
 
 Route::name('api.')->group(function () {
-    Route::middleware(['auth:sanctum', 'hall', 'throttle:300,1'])->group(function () {
+    Route::middleware(['auth:sanctum', 'throttle:300,1'])->group(function () {
         Route::get('/user', [AuthController::class, 'profile']);
         Route::post('/user/profile', [AuthController::class, 'updateProfile']);
         Route::post('/user/password', [AuthController::class, 'changePassword']);
@@ -47,9 +45,11 @@ Route::name('api.')->group(function () {
         Route::post('/accounting/categories', [AccountingController::class, 'storeCategory']);
         Route::patch('/accounting/categories/{id}', [AccountingController::class, 'updateCategory']);
         Route::delete('/accounting/categories/{id}', [AccountingController::class, 'deleteCategory']);
-        
-        Route::get('/halls', [HallController::class, 'index']);
-        Route::get('/halls/{id}', [HallController::class, 'show']);
+
+        // Loans & Borrowings (হাওলাত / ঋণ)
+        Route::apiResource('loans', \App\Http\Controllers\Api\LoanController::class);
+        Route::post('/loans/{id}/payments', [\App\Http\Controllers\Api\LoanController::class, 'addPayment']);
+        Route::delete('/loans/payments/{paymentId}', [\App\Http\Controllers\Api\LoanController::class, 'destroyPayment']);
         
         Route::apiResource('staff', StaffController::class);
         Route::patch('/staff/{id}/status', [StaffController::class, 'updateStatus']);

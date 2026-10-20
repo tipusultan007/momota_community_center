@@ -55,7 +55,6 @@ class CommissionController extends Controller
                 ->first();
 
             Income::create([
-                'hall_id' => $commission->booking?->hall_id, // Get hall from booking
                 'amount' => $commission->amount,
                 'income_category_id' => $category?->id,
                 'category' => 'কমিশন',
@@ -91,7 +90,6 @@ class CommissionController extends Controller
                 ->first();
 
             Expense::create([
-                'hall_id' => $commission->booking?->hall_id,
                 'amount' => $commission->net_payout,
                 'expense_category_id' => $category?->id,
                 'category' => 'ভেন্ডর পেমেন্ট',

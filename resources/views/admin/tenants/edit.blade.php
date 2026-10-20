@@ -72,8 +72,8 @@
                             <div class="col-md-5">
                                 <label class="form-label required">স্ল্যাগ / আইডেন্টিফায়ার (URL Slug)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light text-muted small">/hall/</span>
-                                    <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug', $tenant->slug) }}" required placeholder="radisson-hall">
+                                    <span class="input-group-text bg-light text-muted small">/venue/</span>
+                                    <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug', $tenant->slug) }}" required placeholder="radisson-venue">
                                 </div>
                                 <small class="form-hint">ইউনিক ইংরেজি ছোট হাতের অক্ষর ও হাইফেন ব্যবহার করুন।</small>
                                 @error('slug')
@@ -154,11 +154,6 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">সর্বোচ্চ হল সংখ্যা লিমিট (Max Hall Limit)</label>
-                                <input type="number" name="hall_limit" min="1" max="100" class="form-control" value="{{ old('hall_limit', $settings['hall_limit'] ?? 5) }}">
-                                <small class="form-hint">এই ভেন্ডর সর্বোচ্চ কয়টি হল তৈরি করতে পারবে।</small>
-                            </div>
                             <div class="col-md-6">
                                 <label class="form-label">সর্বোচ্চ স্টাফ/ম্যানেজার লিমিট (Staff Limit)</label>
                                 <input type="number" name="staff_limit" min="1" max="500" class="form-control" value="{{ old('staff_limit', $settings['staff_limit'] ?? 10) }}">

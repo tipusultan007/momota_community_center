@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->integer('total_stock')->default(0);
             $table->integer('available_stock')->default(0);

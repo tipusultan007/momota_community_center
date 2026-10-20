@@ -38,7 +38,7 @@
             <tr>
                 <th>Date</th>
                 <th>Customer</th>
-                <th>Hall</th>
+                <th>Venue</th>
                 <th>Event Type</th>
                 <th>Guests</th>
                 <th>Status</th>
@@ -50,7 +50,7 @@
             <tr>
                 <td>{{ $booking->booking_date }}</td>
                 <td>{{ $booking->customer_name }}</td>
-                <td>{{ $booking->hall->name ?? 'N/A' }}</td>
+                <td>{{ $tenant->name }}</td>
                 <td>{{ $booking->event_type }}</td>
                 <td>{{ $booking->total_guests }}</td>
                 <td>
@@ -65,7 +65,7 @@
     </table>
 
     <div style="margin-top: 50px; font-size: 12px; color: #6b7280; text-align: center;">
-        Generated on {{ now()->toDateTimeString() }} by PranganHQ
+        Generated on {{ now()->toDateTimeString() }} by Momota Community Center
     </div>
 </body>
 </html>

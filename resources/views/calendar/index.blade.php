@@ -231,7 +231,7 @@
                                                     {{ $ub->event_type }} - {{ $ub->booking?->customer?->name ?? 'N/A' }}
                                                 </div>
                                                 <div class="small text-muted mt-1">
-                                                    <span class="badge badge-outline text-{{ $color }}">{{ $ub->hall?->name }}</span>
+                                                    <span class="badge badge-outline text-{{ $color }}">{{ $businessSetting?->company_name }}</span>
                                                     <span class="ms-1">| @if($ub->slot == 'morning') সকালে @elseif($ub->slot == 'evening') রাতে @else সারাদিন @endif</span>
                                                 </div>
                                             </div>
@@ -980,8 +980,8 @@
                                 <div class="text-muted">${props.phone}</div>
                             </div>
                             <div class="col-6">
-                                <div class="small text-muted">হল ও স্লট</div>
-                                <div><strong>${props.hall}</strong></div>
+                                <div class="small text-muted">স্লট</div>
+                                <div><strong>${props.venue}</strong></div>
                                 <div class="small">${(props.slot === 'day' || props.slot === 'morning') ? 'দিন (Day)' : ((props.slot === 'night' || props.slot === 'evening') ? 'রাত (Night)' : 'সারাদিন')}</div>
                             </div>
                             <div class="col-6 text-end">

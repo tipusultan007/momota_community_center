@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../providers/accounting_provider.dart';
-import '../../providers/hall_provider.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../models/transaction.dart';
 import '../../api/api_service.dart';
@@ -25,7 +24,6 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   final _descriptionController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   int? _categoryId;
-  int? _hallId;
   bool _isSaving = false;
 
   @override
@@ -37,11 +35,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       _descriptionController.text = widget.transaction!.description ?? '';
       _selectedDate = DateTime.parse(widget.transaction!.date);
       _categoryId = widget.transaction!.categoryId;
-      _hallId = widget.transaction!.hallId;
-    } else {
-      _hallId = context.read<HallProvider>().activeHall['id'];
     }
-    
+
     Future.microtask(() => context.read<AccountingProvider>().fetchCategories());
   }
 
@@ -59,7 +54,6 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       'amount': double.parse(_amountController.text),
       'date': _selectedDate.toIso8601String().split('T')[0],
       'description': _descriptionController.text,
-      'hall_id': _hallId,
       '${_type}_category_id': _categoryId,
     };
 

@@ -57,17 +57,18 @@ class TransactionController extends Controller
         // Calculate Opening Balance (all transactions prior to start date)
         // If type filter is applied, do we filter opening balance? Usually opening balance is total, regardless of type filter, 
         // but if filtering by type, opening balance of JUST that type might be weird. Let's calculate overall opening balance.
-        $openingIncomes = Transaction::where('date', '<', $startDate)->where('type', 'income')->sum('amount');
-        $openingExpenses = Transaction::where('date', '<', $startDate)->whereIn('type', ['expense', 'salary', 'commission'])->sum('amount');
+        $openingIncomes = Transaction::where('date', '<', $startDate)->whereIn('type', ['income', 'loan_taken'])->sum('amount');
+        $openingExpenses = Transaction::where('date', '<', $startDate)->whereIn('type', ['expense', 'salary', 'commission', 'loan_repayment'])->sum('amount');
         $openingBalance = $openingIncomes - $openingExpenses;
 
         // Calculate Period Totals
-        $periodIncomesQuery = Transaction::whereBetween('date', [$startDate, $endDate])->where('type', 'income');
-        $periodExpensesQuery = Transaction::whereBetween('date', [$startDate, $endDate])->whereIn('type', ['expense', 'salary', 'commission']);
+        $periodIncomesQuery = Transaction::whereBetween('date', [$startDate, $endDate])->whereIn('type', ['income', 'loan_taken']);
+        $periodExpensesQuery = Transaction::whereBetween('date', [$startDate, $endDate])->whereIn('type', ['expense', 'salary', 'commission', 'loan_repayment']);
 
         if ($request->filled('type')) {
-            if ($request->type == 'income') {
+            if (in_array($request->type, ['income', 'loan_taken'])) {
                 $periodExpensesQuery->where('id', -1); // Force empty
+                $periodIncomesQuery->where('type', $request->type);
             } else {
                 $periodIncomesQuery->where('id', -1); // Force empty
                 $periodExpensesQuery->where('type', $request->type);

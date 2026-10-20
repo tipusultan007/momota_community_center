@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Income;
 use App\Models\Expense;
-use App\Models\Employee;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -15,29 +14,19 @@ class ReportController extends Controller
 {
     public function summary(Request $request)
     {
-        $hallId = $request->header('X-Hall-Id');
         $startDate = $request->query('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->query('end_date', Carbon::now()->endOfMonth()->toDateString());
 
         $bookings = Booking::select('id', 'status')
-            ->when($hallId, function ($query) use ($hallId) {
-                return $query->where('hall_id', $hallId);
-            })
             ->whereHas('items', function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('event_date', [$startDate, $endDate]);
             })
             ->get();
 
-        $incomes = (float) Income::when($hallId, function ($query) use ($hallId) {
-                return $query->where('hall_id', $hallId);
-            })
-            ->whereBetween('date', [$startDate, $endDate])
+        $incomes = (float) Income::whereBetween('date', [$startDate, $endDate])
             ->sum('amount');
 
-        $expenses = (float) Expense::when($hallId, function ($query) use ($hallId) {
-                return $query->where('hall_id', $hallId);
-            })
-            ->whereBetween('date', [$startDate, $endDate])
+        $expenses = (float) Expense::whereBetween('date', [$startDate, $endDate])
             ->sum('amount');
 
         return response()->json([
@@ -56,12 +45,11 @@ class ReportController extends Controller
 
     public function downloadPdf(Request $request)
     {
-        $hallId = $request->header('X-Hall-Id');
         $startDate = $request->query('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->query('end_date', Carbon::now()->endOfMonth()->toDateString());
         $type = $request->query('type', 'financial');
 
-        $data = $this->getReportData($hallId, $startDate, $endDate, $type);
+        $data = $this->getReportData($startDate, $endDate, $type);
         $data['tenant'] = \App\Models\BusinessSetting::get();
         $data['start_date'] = $startDate;
         $data['end_date'] = $endDate;
@@ -71,13 +59,10 @@ class ReportController extends Controller
         return $pdf->download("report_{$type}_{$startDate}.pdf");
     }
 
-    private function getReportData($hallId, $startDate, $endDate, $type)
+    private function getReportData($startDate, $endDate, $type)
     {
         if ($type === 'financial') {
-            $incomes = Income::when($hallId, function ($query) use ($hallId) {
-                    return $query->where('hall_id', $hallId);
-                })
-                ->whereBetween('date', [$startDate, $endDate])
+            $incomes = Income::whereBetween('date', [$startDate, $endDate])
                 ->get();
 
             $expenses = Expense::whereBetween('date', [$startDate, $endDate])
@@ -92,13 +77,9 @@ class ReportController extends Controller
         }
 
         if ($type === 'bookings') {
-            $bookings = Booking::when($hallId, function ($query) use ($hallId) {
-                    return $query->where('hall_id', $hallId);
-                })
-                ->whereHas('items', function ($query) use ($startDate, $endDate) {
+            $bookings = Booking::whereHas('items', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('event_date', [$startDate, $endDate]);
                 })
-                ->with('hall')
                 ->get();
 
             return [

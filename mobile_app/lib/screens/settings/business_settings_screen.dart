@@ -17,16 +17,22 @@ class _BusinessSettingsScreenState extends State<BusinessSettingsScreen> {
   late TextEditingController _addressController;
   late TextEditingController _phoneController;
   late TextEditingController _invoiceConditionsController;
+  late TextEditingController _capacityController;
+  late TextEditingController _pricePerSlotController;
+  late TextEditingController _defaultServerRateController;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     final tenant = context.read<AuthProvider>().user?['tenant'];
-    _nameController = TextEditingController(text: tenant?['name']);
+    _nameController = TextEditingController(text: tenant?['name'] ?? tenant?['company_name']);
     _addressController = TextEditingController(text: tenant?['address']);
     _phoneController = TextEditingController(text: tenant?['phone']);
     _invoiceConditionsController = TextEditingController(text: tenant?['invoice_conditions']);
+    _capacityController = TextEditingController(text: tenant?['capacity']?.toString() ?? '');
+    _pricePerSlotController = TextEditingController(text: tenant?['price_per_slot']?.toString() ?? '');
+    _defaultServerRateController = TextEditingController(text: tenant?['default_server_rate']?.toString() ?? '');
   }
 
   @override
@@ -35,6 +41,9 @@ class _BusinessSettingsScreenState extends State<BusinessSettingsScreen> {
     _addressController.dispose();
     _phoneController.dispose();
     _invoiceConditionsController.dispose();
+    _capacityController.dispose();
+    _pricePerSlotController.dispose();
+    _defaultServerRateController.dispose();
     super.dispose();
   }
 
@@ -48,6 +57,9 @@ class _BusinessSettingsScreenState extends State<BusinessSettingsScreen> {
       'address': _addressController.text,
       'phone': _phoneController.text,
       'invoice_conditions': _invoiceConditionsController.text,
+      'capacity': int.tryParse(_capacityController.text),
+      'price_per_slot': double.tryParse(_pricePerSlotController.text),
+      'default_server_rate': double.tryParse(_defaultServerRateController.text),
     });
 
     setState(() => _isLoading = false);
@@ -93,6 +105,12 @@ class _BusinessSettingsScreenState extends State<BusinessSettingsScreen> {
                     _buildTextField(_phoneController, 'ফোন নম্বর', Icons.phone_outlined, keyboardType: TextInputType.phone),
                     const SizedBox(height: 20),
                     _buildTextField(_addressController, 'ঠিকানা', Icons.location_on_outlined, maxLines: 2),
+                    const SizedBox(height: 20),
+                    _buildTextField(_capacityController, 'ধারণক্ষমতা (Capacity)', Icons.groups_outlined, keyboardType: TextInputType.number),
+                    const SizedBox(height: 20),
+                    _buildTextField(_pricePerSlotController, 'প্রতি স্লটের ভাড়া (৳)', Icons.payments_outlined, keyboardType: TextInputType.number),
+                    const SizedBox(height: 20),
+                    _buildTextField(_defaultServerRateController, 'ডিফল্ট কর্মী রেট (৳)', Icons.badge_outlined, keyboardType: TextInputType.number),
                     const SizedBox(height: 20),
                     _buildTextField(_invoiceConditionsController, 'ইনভয়েস শর্তাবলী', Icons.description_outlined, maxLines: 3),
                   ],

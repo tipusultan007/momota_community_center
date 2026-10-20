@@ -13,16 +13,7 @@ class CommissionController extends Controller
 {
     public function index(Request $request)
     {
-        $hallId = session('active_hall_id');
-
         $query = Commission::query();
-
-        if ($hallId) {
-            // Check if booking belongs tohall
-            $query->whereHas('booking', function($q) use ($hallId) {
-                $q->where('hall_id', $hallId);
-            });
-        }
 
         if ($request->vendor_id) {
             $query->where('vendor_id', $request->vendor_id);
@@ -59,7 +50,6 @@ class CommissionController extends Controller
 
             // 3. Record as Income
             Income::create([
-                'hall_id' => $commission->booking->hall_id ?? session('active_hall_id'),
                 'amount' => $commission->amount,
                 'category' => $category->name,
                 'income_category_id' => $category->id,
@@ -90,7 +80,6 @@ class CommissionController extends Controller
 
             // 3. Record as Expense
             \App\Models\Expense::create([
-                'hall_id' => $commission->booking->hall_id ?? session('active_hall_id'),
                 'amount' => $commission->net_payout,
                 'category' => $category->name,
                 'expense_category_id' => $category->id,

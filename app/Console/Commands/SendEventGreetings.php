@@ -33,12 +33,12 @@ class SendEventGreetings extends Command
             $settings = $tenant->settings ?? [];
 
             if ($settings['auto_event_greeting'] ?? false) {
-                $template = $settings['sms_template_greeting'] ?? "প্রিয় [CustomerName], আগামীকাল আপনার ইভেন্টের জন্য আমরা প্রস্তুত। দেখা হবে ইনশাআল্লাহ! - [HallName]";
+                $template = $settings['sms_template_greeting'] ?? "প্রিয় [CustomerName], আগামীকাল আপনার ইভেন্টের জন্য আমরা প্রস্তুত। দেখা হবে ইনশাআল্লাহ! - [VenueName]";
                 
                 $message = $smsService->parseTemplate($template, [
                     'CustomerName' => $booking->customer->name,
                     'EventDate' => $booking->items->first()->event_date->format('d M, Y'),
-                    'HallName' => $booking->items->first()->hall->name ?? $tenant->name,
+                    'VenueName' => $tenant->name,
                 ]);
 
                 $smsService->send($tenant, $booking->customer->phone, $message, $booking->id);

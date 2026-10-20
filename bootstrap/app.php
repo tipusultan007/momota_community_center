@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
             'subscription' => \App\Http\Middleware\CheckSubscription::class,
-            'hall' => \App\Http\Middleware\HallMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -3,16 +3,14 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
-use App\Traits\BelongsToHall;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AssetAssignment extends Model
 {
-    use HasFactory, BelongsToTenant, BelongsToHall;
+    use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'hall_id',
         'booking_item_id',
         'asset_id',
         'quantity_out',

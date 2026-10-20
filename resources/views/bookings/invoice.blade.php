@@ -28,14 +28,14 @@
             border-bottom: 2px solid #0056b3;
             padding-bottom: 6px;
         }
-        .hall-name {
+        .venue-name {
             font-size: 18px;
             font-weight: bold;
             color: #0056b3;
             margin: 0;
             line-height: 1.2;
         }
-        .hall-address {
+        .venue-address {
             font-size: 10.5px;
             color: #475569;
             margin: 1px 0;
@@ -208,7 +208,7 @@
 </head>
 <body>
     <div class="invoice-box">
-        <!-- Optimized Header with Side-by-Side Logo and Hall Info -->
+        <!-- Optimized Header with Side-by-Side Logo and Venue Info -->
         <div class="header">
             <table width="100%" style="border-collapse: collapse;">
                 <tr>
@@ -224,9 +224,9 @@
                                     </td>
                                 @endif
                                 <td style="vertical-align: middle;">
-                                    <h1 class="hall-name">{{ $booking->hall->name ?? $booking->tenant->name }}</h1>
-                                    <p class="hall-address">{{ ($booking->hall && $booking->hall->address) ? $booking->hall->address : ($booking->tenant->address ?: 'কমিউনিটি সেন্টার রোড, ঢাকা, বাংলাদেশ') }}</p>
-                                    <p class="hall-address">মোবাইল: {{ ($booking->hall && $booking->hall->phone) ? $booking->hall->phone : ($booking->tenant->phone ?: '01xxxxxxxxx') }}</p>
+                                    <h1 class="venue-name">{{ $booking->tenant->name }}</h1>
+                                    <p class="venue-address">{{ $booking->tenant->address ?: 'কমিউনিটি সেন্টার রোড, ঢাকা, বাংলাদেশ' }}</p>
+                                    <p class="venue-address">মোবাইল: {{ $booking->tenant->phone ?: '01xxxxxxxxx' }}</p>
                                 </td>
                             </tr>
                         </table>

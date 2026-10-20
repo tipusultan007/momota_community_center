@@ -5,7 +5,7 @@ import '../../models/booking.dart';
 import '../../models/booking_item.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/customer_provider.dart';
-import '../../providers/hall_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/vendor_provider.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../api/api_service.dart';
@@ -145,18 +145,17 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   }
 
   void _addNewItem() {
-    final hallProvider = context.read<HallProvider>();
-    final activeHall = hallProvider.activeHall;
+    final tenant = context.read<AuthProvider>().user?['tenant'];
     final defaultDate = widget.initialDate ?? DateTime.now().toIso8601String().split('T')[0];
+    final pricePerSlot = _toDouble(tenant?['price_per_slot'] ?? 30000);
     setState(() {
       _items.add(BookingItem(
-        hallId: _toInt(activeHall['id']),
-        hallName: activeHall['name']?.toString() ?? 'মমতা কমিউনিটি সেন্টার',
         eventDate: defaultDate,
         slot: 'day',
         eventType: _eventTypes.first,
-        basePrice: _toDouble(activeHall['price_per_slot'] ?? 30000),
-        subTotal: _toDouble(activeHall['price_per_slot'] ?? 30000),
+        serverRate: _toDouble(tenant?['default_server_rate'] ?? 500),
+        basePrice: pricePerSlot,
+        subTotal: pricePerSlot,
       ));
     });
     _checkAvailability(_items.length - 1);
@@ -173,7 +172,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     final hasDup = _items.asMap().entries.any((entry) {
       if (entry.key == index) return false;
       final otherSlot = (entry.value.slot == 'night' || entry.value.slot == 'evening') ? 'night' : 'day';
-      return entry.value.eventDate == item.eventDate && otherSlot == currentSlot && entry.value.hallId == item.hallId;
+      return entry.value.eventDate == item.eventDate && otherSlot == currentSlot;
     });
 
     if (hasDup) {
@@ -192,7 +191,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
     // 2. Query check-availability API
     try {
-      String path = 'bookings/check-availability?hall_id=${item.hallId}&event_date=${item.eventDate}&slot=$currentSlot';
+      String path = 'bookings/check-availability?event_date=${item.eventDate}&slot=$currentSlot';
       if (widget.booking != null) {
         path += '&exclude_booking_id=${widget.booking!.id}';
       }
@@ -214,13 +213,6 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     for (int i = 0; i < _items.length; i++) {
       _checkAvailability(i);
     }
-  }
-
-  int _toInt(dynamic value) {
-    if (value == null) return 0;
-    if (value is int) return value;
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
   }
 
   double get _totalAmount => _items.fold(0, (sum, item) => sum + item.subTotal);
@@ -253,7 +245,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
       for (int j = i + 1; j < _items.length; j++) {
         final s1 = (_items[i].slot == 'night' || _items[i].slot == 'evening') ? 'night' : 'day';
         final s2 = (_items[j].slot == 'night' || _items[j].slot == 'evening') ? 'night' : 'day';
-        if (_items[i].eventDate == _items[j].eventDate && s1 == s2 && _items[i].hallId == _items[j].hallId) {
+        if (_items[i].eventDate == _items[j].eventDate && s1 == s2) {
           final slotLabel = s1 == 'day' ? 'দিন (Day)' : 'রাত (Night)';
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.red.shade700,

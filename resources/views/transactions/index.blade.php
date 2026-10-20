@@ -1,4 +1,4 @@
-﻿<x-tabler-layout :title="'সকল লেনদেন (Cashbook)'">
+<x-tabler-layout :title="'সকল লেনদেন (Cashbook)'">
     <x-slot:header>
         <div class="page-header d-print-none">
             <div class="row g-2 align-items-center">
@@ -33,6 +33,8 @@
                                         <option value="expense" {{ request('type') == 'expense' ? 'selected' : '' }}>ব্যয় (Expense)</option>
                                         <option value="salary" {{ request('type') == 'salary' ? 'selected' : '' }}>বেতন (Salary)</option>
                                         <option value="commission" {{ request('type') == 'commission' ? 'selected' : '' }}>কমিশন (Commission)</option>
+                                        <option value="loan_taken" {{ request('type') == 'loan_taken' ? 'selected' : '' }}>হাওলাত গ্রহণ (Loan Taken)</option>
+                                        <option value="loan_repayment" {{ request('type') == 'loan_repayment' ? 'selected' : '' }}>হাওলাত পরিশোধ (Loan Repaid)</option>
                                     </select>
                                 </div>
                                 <div class="col-auto">
@@ -60,8 +62,8 @@
                                         <th>তারিখ</th>
                                         <th>ধরণ</th>
                                         <th>বিবরণ</th>
-                                        <th>আয় (In)</th>
-                                        <th>ব্যয় (Out)</th>
+                                        <th>আয় / গ্রহণ (In)</th>
+                                        <th>ব্যয় / পরিশোধ (Out)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -84,6 +86,10 @@
                                                     <span class="badge bg-warning text-warning-fg">বেতন</span>
                                                 @elseif($transaction->type == 'commission')
                                                     <span class="badge bg-info text-info-fg">কমিশন</span>
+                                                @elseif($transaction->type == 'loan_taken')
+                                                    <span class="badge bg-azure text-azure-fg">হাওলাত গ্রহণ</span>
+                                                @elseif($transaction->type == 'loan_repayment')
+                                                    <span class="badge bg-purple text-purple-fg">হাওলাত পরিশোধ</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -93,14 +99,14 @@
                                                 @endif
                                             </td>
                                             <td class="text-success fw-bold">
-                                                @if($transaction->type == 'income')
+                                                @if(in_array($transaction->type, ['income', 'loan_taken']))
                                                     + ৳ {{ number_format($transaction->amount, 2) }}
                                                 @else
                                                     -
                                                 @endif
                                             </td>
                                             <td class="text-danger fw-bold">
-                                                @if(in_array($transaction->type, ['expense', 'salary', 'commission']))
+                                                @if(in_array($transaction->type, ['expense', 'salary', 'commission', 'loan_repayment']))
                                                     - ৳ {{ number_format($transaction->amount, 2) }}
                                                 @else
                                                     -

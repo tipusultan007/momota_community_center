@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
-use App\Models\Hall;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -30,23 +29,16 @@ class DatabaseSeeder extends Seeder
         \App\Models\BusinessSetting::updateOrCreate(
             ['id' => 1],
             [
-                'name' => 'গ্র্যান্ড প্যালেস কনভেনশন হল',
+                'name' => 'মমতা কমিউনিটি সেন্টার',
                 'phone' => '01711112222',
                 'address' => 'ঢাকা, বাংলাদেশ',
+                'capacity' => 500,
+                'price_per_slot' => 30000,
+                'default_server_rate' => 500,
             ]
         );
 
-        // 3. Demo Hall
-        Hall::firstOrCreate(
-            ['name' => 'রয়েল ব্যাঙ্কোয়েট হল'],
-            [
-                'capacity' => 800,
-                'price_per_slot' => 50000,
-                'is_active' => true,
-            ]
-        );
-
-        // 4. Demo Admin User
+        // 3. Demo Admin User
         $user = User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
@@ -61,8 +53,8 @@ class DatabaseSeeder extends Seeder
         // Assign Admin role
         $user->assignRole('Tenant Admin');
 
-        // 5. Standard Categories
-        $incomeCats = ['হল বুকিং', 'ক্যাটারিং ও সার্ভিস', 'অতিরিক্ত সেবা', 'অন্যান্য আয়'];
+        // 4. Standard Categories
+        $incomeCats = ['ভেন্যু বুকিং', 'ক্যাটারিং ও সার্ভিস', 'অতিরিক্ত সেবা', 'অন্যান্য আয়'];
         foreach ($incomeCats as $cat) {
             \App\Models\IncomeCategory::firstOrCreate(['name' => $cat]);
         }

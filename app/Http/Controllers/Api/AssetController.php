@@ -10,10 +10,7 @@ class AssetController extends Controller
 {
     public function index(Request $request)
     {
-        $hallId = $request->header('X-Hall-Id');
-
-        $assets = Asset::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-            ->get();
+        $assets = Asset::get();
 
         return response()->json([
             'status' => 'success',
@@ -29,11 +26,7 @@ class AssetController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-        $defaultHall = \App\Models\Hall::first();
-        $hallId = $request->header('X-Hall-Id') ?? ($defaultHall ? $defaultHall->id : null);
-
         $asset = Asset::create([
-            'hall_id' => $hallId,
             'name' => $request->name,
             'total_stock' => $request->total_stock,
             'available_stock' => $request->total_stock,

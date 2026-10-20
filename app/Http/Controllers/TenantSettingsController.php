@@ -10,19 +10,8 @@ class TenantSettingsController extends Controller
     public function index()
     {
         $tenant = \App\Models\BusinessSetting::get();
-        $hallId = session('active_hall_id');
-        $hall = ($hallId ? \App\Models\Hall::find($hallId) : null) ?? \App\Models\Hall::first();
-        
-        if (!$hall) {
-            $hall = \App\Models\Hall::create([
-                'name' => $tenant->company_name ?? 'মূল কনভেনশন হল',
-                'capacity' => 500,
-                'price_per_slot' => 30000,
-                'is_active' => true
-            ]);
-        }
-        
-        return view('tenants.settings', compact('tenant', 'hall'));
+
+        return view('tenants.settings', compact('tenant'));
     }
 
     public function update(Request $request)
@@ -44,6 +33,9 @@ class TenantSettingsController extends Controller
             'company_name' => $request->name,
             'address' => $request->address,
             'phone' => $request->phone,
+            'capacity' => $request->capacity,
+            'price_per_slot' => $request->price_per_slot,
+            'default_server_rate' => $request->default_server_rate,
             'invoice_conditions' => $request->invoice_conditions,
         ];
 
@@ -69,21 +61,6 @@ class TenantSettingsController extends Controller
 
         $business->update($businessData);
 
-        // Update current active hall
-        $hallId = session('active_hall_id');
-        $hall = ($hallId ? \App\Models\Hall::find($hallId) : null) ?? \App\Models\Hall::first();
-
-        if ($hall) {
-            $hall->update([
-                'name' => $request->name,
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'capacity' => $request->capacity,
-                'price_per_slot' => $request->price_per_slot,
-                'default_server_rate' => $request->default_server_rate,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'ব্যবসা ও হলের তথ্য সফলভাবে আপডেট করা হয়েছে।');
+        return redirect()->back()->with('success', 'ব্যবসার তথ্য সফলভাবে আপডেট করা হয়েছে।');
     }
 }

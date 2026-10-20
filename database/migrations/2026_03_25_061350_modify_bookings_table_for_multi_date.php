@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->dropForeign(['hall_id']);
-            $table->dropColumn(['hall_id', 'event_date', 'slot']);
+            $table->dropColumn(['event_date', 'slot']);
         });
     }
 
@@ -23,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->foreignId('hall_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('event_date')->nullable();
             $table->string('slot')->nullable();
         });

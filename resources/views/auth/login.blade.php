@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div>
         <h2 class="text-2xl font-bold tracking-tight text-primary-container text-center mb-1">স্বাগতম ফিরে এসেছেন</h2>
-        <p class="text-center text-sm text-on-surface-variant mb-8">আপনার অ্যাকাউন্টে লগইন করুন</p>
+        <p class="text-center text-sm text-on-surface-variant mb-8">আপনার অ্যাডমিন অ্যাকাউন্টে লগইন করুন</p>
         
         <form action="{{ route('login') }}" method="post" class="space-y-6">
             @csrf
@@ -51,20 +51,9 @@
             </div>
         </form>
 
-        <div class="mt-10">
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div class="w-full border-t border-surface-container"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="bg-white px-2 text-on-surface-variant font-medium">অথবা</span>
-                </div>
-            </div>
-
-            <div class="mt-6 text-center text-sm text-on-surface-variant">
-                এখনও অ্যাকাউন্ট নেই? 
-                <a href="{{ route('register') }}" class="font-bold text-secondary hover:text-secondary-fixed-dim">নতুন অ্যাকাউন্ট খুলুন</a>
-            </div>
-        </div>
+        <p class="mt-8 text-center text-xs leading-5 text-on-surface-variant">
+            এই লগইনটি শুধুমাত্র অনুমোদিত অ্যাডমিন ব্যবহারকারীদের জন্য।<br>
+            নতুন অ্যাকাউন্ট তৈরি করতে সিস্টেম অ্যাডমিনের সাথে যোগাযোগ করুন।
+        </p>
     </div>
 </x-guest-layout>

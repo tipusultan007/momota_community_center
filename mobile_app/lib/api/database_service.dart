@@ -43,19 +43,12 @@ class DatabaseService {
         method TEXT,
         path TEXT,
         body TEXT,
-        hall_id TEXT,
         created_at INTEGER
       )
     ''');
   }
 
-  Future _onUpgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      try {
-        await db.execute('ALTER TABLE sync_queue ADD COLUMN hall_id TEXT');
-      } catch (_) {}
-    }
-  }
+  Future _onUpgradeDB(Database db, int oldVersion, int newVersion) async {}
 
   // Cache Operations
   Future<void> saveCache(String key, Map<String, dynamic> data) async {
@@ -95,13 +88,12 @@ class DatabaseService {
   }
 
   // Sync Queue Operations
-  Future<void> addToQueue(String method, String path, dynamic body, {String? hallId}) async {
+  Future<void> addToQueue(String method, String path, dynamic body) async {
     final db = await instance.database;
     await db.insert('sync_queue', {
       'method': method,
       'path': path,
       'body': body != null ? jsonEncode(body) : null,
-      'hall_id': hallId,
       'created_at': DateTime.now().millisecondsSinceEpoch,
     });
   }

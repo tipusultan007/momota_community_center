@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import 'main_navigation_screen.dart';
-import 'registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -120,10 +119,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: _emailController,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15),
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                         decoration: InputDecoration(
                           hintText: '017xxxxxxxx বা user@example.com',
-                          prefixIcon: const Icon(Icons.phone_android_outlined, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.phone_android_outlined,
+                            size: 20,
+                          ),
                           fillColor: AppTheme.backgroundSlate,
                         ),
                         keyboardType: TextInputType.text,
@@ -142,30 +147,46 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15),
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                         decoration: InputDecoration(
                           hintText: '••••••••',
-                          prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.lock_outline_rounded,
+                            size: 20,
+                          ),
                           fillColor: AppTheme.backgroundSlate,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
                               size: 20,
                               color: Colors.grey,
                             ),
-                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 40),
                       authProvider.isLoading
-                          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryEmerald))
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primaryEmerald,
+                              ),
+                            )
                           : Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppTheme.primaryEmerald.withAlpha(60),
+                                    color: AppTheme.primaryEmerald.withAlpha(
+                                      60,
+                                    ),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),
@@ -175,7 +196,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppTheme.primaryEmerald,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -186,22 +209,31 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _emailController.text.trim(),
                                     _passwordController.text.trim(),
                                   );
-                                  
+
                                   if (!mounted) return;
                                   if (success) {
                                     Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const MainNavigationScreen(),
+                                      ),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         behavior: SnackBarBehavior.floating,
                                         margin: const EdgeInsets.all(20),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                        ),
                                         backgroundColor: Colors.redAccent,
                                         content: Text(
                                           'মোবাইল নম্বর/ইমেল বা পাসওয়ার্ড ভুল।',
-                                          style: GoogleFonts.manrope(fontWeight: FontWeight.w700),
+                                          style: GoogleFonts.manrope(
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
                                       ),
                                     );
@@ -220,31 +252,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 36),
                 Center(
-                  child: TextButton(
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegistrationScreen())),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
-                    child: RichText(
-                      text: TextSpan(
-                        text: 'এখনো অ্যাকাউন্ট নেই? ',
-                        style: GoogleFonts.manrope(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'নতুন অ্যাকাউন্ট তৈরি করুন',
-                            style: TextStyle(
-                              color: AppTheme.primaryEmerald,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ],
-                      ),
+                  child: Text(
+                    'শুধুমাত্র অনুমোদিত অ্যাডমিন ব্যবহারকারীদের জন্য।\nনতুন অ্যাকাউন্ট তৈরি করতে সিস্টেম অ্যাডমিনের সাথে যোগাযোগ করুন।',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      height: 1.6,
                     ),
                   ),
                 ),

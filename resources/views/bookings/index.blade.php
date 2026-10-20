@@ -264,10 +264,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @foreach($booking->items->pluck('hall.name')->unique() as $hallName)
-                                            <div class="fw-semibold">{{ $hallName }}</div>
-                                        @endforeach
-                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                        <div class="d-flex flex-wrap gap-1">
                                             @if($itemCount == 1)
                                                 @php [$slotLabel, $slotBadge] = $slotOf($booking->items->first()->slot); @endphp
                                                 <span class="badge {{ $slotBadge }}">{{ $slotLabel }}</span>
@@ -320,7 +317,6 @@
                                                                 customer: '{{ addslashes($booking->customer->name) }}',
                                                                 phone: '{{ addslashes($booking->customer->phone) }}',
                                                                 date: '{{ addslashes($eventDate ? $eventDate->format('d M, Y') : 'N/A') }}',
-                                                                halls: '{{ addslashes($booking->items->pluck('hall.name')->unique()->implode(', ')) }}',
                                                                 total: '{{ number_format($booking->total_amount, 2) }}',
                                                                 advance: '{{ number_format($booking->advance_amount, 2) }}'
                                                             })"
@@ -371,7 +367,7 @@
                         <div>গ্রাহক: ${booking.customer}</div>
                         <div>মোবাইল: ${booking.phone}</div>
                         <div>তারিখ: ${booking.date}</div>
-                        <div>হল: ${booking.halls}</div>
+                        <div>তারিখ: ${booking.date}</div>
                         <div>মোট টাকা: ৳ ${booking.total}</div>
                         <div>অগ্রিম: ৳ ${booking.advance}</div>
                     </div>

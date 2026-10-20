@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('incomes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 12, 2);
             $table->string('category')->default('booking'); // booking, other, etc.
             $table->foreignId('booking_id')->nullable()->constrained()->onDelete('set null');

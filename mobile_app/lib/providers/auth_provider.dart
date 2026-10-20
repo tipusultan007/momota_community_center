@@ -20,7 +20,8 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   bool get isSubscriptionActive {
-    if (_subscription == null) return true; // Default true offline if unverified
+    if (_subscription == null)
+      return true; // Default true offline if unverified
     final currentSub = _subscription!['current_subscription'];
     if (currentSub == null) return true;
     return currentSub['is_active'] == true;
@@ -51,7 +52,10 @@ class AuthProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           _user = response.data['data'];
           _isAuthenticated = true;
-          await _storage.write(key: 'cached_user_profile', value: jsonEncode(_user));
+          await _storage.write(
+            key: 'cached_user_profile',
+            value: jsonEncode(_user),
+          );
           await fetchSubscription();
         } else if (response.statusCode == 401) {
           await logout();
@@ -71,7 +75,10 @@ class AuthProvider with ChangeNotifier {
       final response = await ApiService.instance.get('/subscription');
       if (response.statusCode == 200) {
         _subscription = response.data['data'];
-        await _storage.write(key: 'cached_subscription', value: jsonEncode(_subscription));
+        await _storage.write(
+          key: 'cached_subscription',
+          value: jsonEncode(_subscription),
+        );
         notifyListeners();
       }
     } catch (e) {
@@ -85,18 +92,24 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final isEmail = loginInput.contains('@');
-      final response = await ApiService.instance.post('/login', data: {
-        'login': loginInput,
-        if (isEmail) 'email': loginInput else 'phone': loginInput,
-        'password': password,
-        'device_name': 'Mobile App',
-      });
+      final response = await ApiService.instance.post(
+        '/login',
+        data: {
+          'login': loginInput,
+          if (isEmail) 'email': loginInput else 'phone': loginInput,
+          'password': password,
+          'device_name': 'Mobile App',
+        },
+      );
 
       if (response.statusCode == 200) {
         final token = response.data['token'];
         _user = response.data['user'];
         await _storage.write(key: AppConstants.tokenKey, value: token);
-        await _storage.write(key: 'cached_user_profile', value: jsonEncode(_user));
+        await _storage.write(
+          key: 'cached_user_profile',
+          value: jsonEncode(_user),
+        );
         ApiService.instance.updateToken(token);
         _isAuthenticated = true;
         _isLoading = false;
@@ -110,44 +123,6 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return false;
     }
-    
-    _isLoading = false;
-    notifyListeners();
-    return false;
-  }
-
-  Future<bool> register(String name, String businessName, String email, String password, String passwordConfirmation, {String? phone}) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final response = await ApiService.instance.post('/register', data: {
-        'name': name,
-        'business_name': businessName,
-        'email': email,
-        if (phone != null && phone.isNotEmpty) 'phone': phone,
-        'password': password,
-        'password_confirmation': passwordConfirmation,
-      });
-
-      if (response.statusCode == 201) {
-        final token = response.data['token'];
-        _user = response.data['user'];
-        await _storage.write(key: AppConstants.tokenKey, value: token);
-        await _storage.write(key: 'cached_user_profile', value: jsonEncode(_user));
-        ApiService.instance.updateToken(token);
-        _isAuthenticated = true;
-        _isLoading = false;
-        await fetchSubscription();
-        notifyListeners();
-        return true;
-      }
-    } catch (e) {
-      debugPrint('Registration Error: $e');
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
 
     _isLoading = false;
     notifyListeners();
@@ -156,7 +131,10 @@ class AuthProvider with ChangeNotifier {
 
   Future<bool> checkoutSubscription(Map<String, dynamic> data) async {
     try {
-      final response = await ApiService.instance.post('/subscription/checkout', data: data);
+      final response = await ApiService.instance.post(
+        '/subscription/checkout',
+        data: data,
+      );
       if (response.statusCode == 201 || response.statusCode == 202) {
         return true;
       }
@@ -197,10 +175,10 @@ class AuthProvider with ChangeNotifier {
 
   Future<bool> updateProfile(String name, String email) async {
     try {
-      final response = await ApiService.instance.post('/user/profile', data: {
-        'name': name,
-        'email': email,
-      });
+      final response = await ApiService.instance.post(
+        '/user/profile',
+        data: {'name': name, 'email': email},
+      );
       if (response.statusCode == 200) {
         _user = response.data['data'];
         notifyListeners();
@@ -212,13 +190,20 @@ class AuthProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> changePassword(String currentPassword, String password, String passwordConfirmation) async {
+  Future<bool> changePassword(
+    String currentPassword,
+    String password,
+    String passwordConfirmation,
+  ) async {
     try {
-      final response = await ApiService.instance.post('/user/password', data: {
-        'current_password': currentPassword,
-        'password': password,
-        'password_confirmation': passwordConfirmation,
-      });
+      final response = await ApiService.instance.post(
+        '/user/password',
+        data: {
+          'current_password': currentPassword,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        },
+      );
       return response.statusCode == 200;
     } catch (e) {
       debugPrint('Error changing password: $e');
@@ -228,7 +213,10 @@ class AuthProvider with ChangeNotifier {
 
   Future<bool> updateTenantSettings(Map<String, dynamic> data) async {
     try {
-      final response = await ApiService.instance.post('/tenant/settings', data: data);
+      final response = await ApiService.instance.post(
+        '/tenant/settings',
+        data: data,
+      );
       if (response.statusCode == 200) {
         // Refresh profile to get updated tenant data
         await checkAuth();

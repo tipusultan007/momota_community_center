@@ -53,38 +53,38 @@
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label class="form-label required">নাম (নাম পরিবর্তন করলে ইনভয়েসেও পরিবর্তন হবে)</label>
-                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $hall->name ?? $tenant->company_name) }}" required>
+                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $tenant->company_name) }}" required>
                                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">ঠিকানা</label>
-                                    <input type="text" name="address" class="form-control @error('address') is-invalid @enderror" value="{{ old('address', $hall->address ?? $tenant->address) }}" placeholder="হলের সঠিক ঠিকানা লিখুন">
+                                    <input type="text" name="address" class="form-control @error('address') is-invalid @enderror" value="{{ old('address', $tenant->address) }}" placeholder="ভেন্যুর সঠিক ঠিকানা লিখুন">
                                     @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">মোবাইল নম্বর (একাধিক নম্বর কমা দিয়ে আলাদা করুন)</label>
-                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $hall->phone ?? $tenant->phone) }}" placeholder="০১xxxxxxxx, ০১xxxxxxxxx">
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $tenant->phone) }}" placeholder="০১xxxxxxxx, ০১xxxxxxxxx">
                                     @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label class="form-label required">হলের ধারণক্ষমতা (মেহমান)</label>
-                                            <input type="number" name="capacity" class="form-control @error('capacity') is-invalid @enderror" value="{{ old('capacity', $hall->capacity ?? 500) }}" required>
+                                            <label class="form-label required">ভেন্যুর ধারণক্ষমতা (মেহমান)</label>
+                                            <input type="number" name="capacity" class="form-control @error('capacity') is-invalid @enderror" value="{{ old('capacity', $tenant->capacity ?? 500) }}" required>
                                             @error('capacity') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label class="form-label required">স্লট প্রতি ভাড়া (৳)</label>
-                                            <input type="number" step="any" name="price_per_slot" class="form-control @error('price_per_slot') is-invalid @enderror" value="{{ old('price_per_slot', $hall->price_per_slot ?? 30000) }}" required>
+                                            <input type="number" step="any" name="price_per_slot" class="form-control @error('price_per_slot') is-invalid @enderror" value="{{ old('price_per_slot', $tenant->price_per_slot ?? 30000) }}" required>
                                             @error('price_per_slot') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label class="form-label required">জনপ্রতি পরিবেশনকারী রেট (৳)</label>
-                                            <input type="number" step="any" name="default_server_rate" class="form-control @error('default_server_rate') is-invalid @enderror" value="{{ old('default_server_rate', $hall->default_server_rate ?? 500) }}" required>
+                                            <input type="number" step="any" name="default_server_rate" class="form-control @error('default_server_rate') is-invalid @enderror" value="{{ old('default_server_rate', $tenant->default_server_rate ?? 500) }}" required>
                                             @error('default_server_rate') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                     </div>
@@ -148,13 +148,13 @@
                                     </label>
                                     @if($tenant->settings['auto_event_greeting'] ?? false)
                                     <div class="mt-2">
-                                        <textarea name="sms_template_greeting" class="form-control form-control-sm" rows="3">{{ $tenant->settings['sms_template_greeting'] ?? "প্রিয় [CustomerName], আগামীকাল আপনার ইভেন্টের জন্য আমরা প্রস্তুত। দেখা হবে ইনশাআল্লাহ! - [HallName]" }}</textarea>
+                                        <textarea name="sms_template_greeting" class="form-control form-control-sm" rows="3">{{ $tenant->settings['sms_template_greeting'] ?? "প্রিয় [CustomerName], আগামীকাল আপনার ইভেন্টের জন্য আমরা প্রস্তুত। দেখা হবে ইনশাআল্লাহ! - [VenueName]" }}</textarea>
                                     </div>
                                     @endif
                                 </div>
                                 
                                 <div class="alert alert-info py-2 small">
-                                    প্লেসহোল্ডার: [CustomerName], [EventDate], [TotalAmount], [DueAmount], [HallName]
+                                    প্লেসহোল্ডার: [CustomerName], [EventDate], [TotalAmount], [DueAmount], [VenueName]
                                 </div>
                             </div>
                         </div>

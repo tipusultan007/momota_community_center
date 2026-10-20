@@ -58,7 +58,7 @@ class VendorController extends Controller
                       ->orWhere('generator_vendor_id', $vendor->id)
                       ->orWhere('decoration_vendor_id', $vendor->id);
             })
-            ->with(['booking.customer', 'hall'])
+            ->with(['booking.customer'])
             ->orderBy('event_date', 'desc')
             ->get();
 
@@ -73,7 +73,7 @@ class VendorController extends Controller
                 'booking_id' => $item->booking?->id,
                 'customer_name' => $item->booking?->customer?->name,
                 'event_date' => $item->event_date,
-                'hall_name' => $item->hall?->name,
+                'venue_name' => \App\Models\BusinessSetting::get()->name,
                 'services' => $services,
                 'total_price' => collect($services)->sum('price')
             ];

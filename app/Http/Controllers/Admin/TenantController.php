@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Models\Hall;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +28,7 @@ class TenantController extends Controller
     {
         $query = Tenant::with(['users' => function($q) {
             $q->latest();
-        }])->withCount(['users', 'halls', 'bookings']);
+        }])->withCount(['users', 'bookings']);
 
         // Search
         if ($request->filled('search')) {
@@ -96,7 +95,6 @@ class TenantController extends Controller
             'subscription_ends_at' => 'nullable|date',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'invoice_conditions' => 'nullable|string|max:2000',
-            'hall_limit' => 'nullable|integer|min:1',
             'staff_limit' => 'nullable|integer|min:1',
             'owner_name' => 'required|string|max:255',
             'owner_email' => 'required|email|max:255|unique:users,email',
@@ -111,7 +109,6 @@ class TenantController extends Controller
             }
 
             $settings = [
-                'hall_limit' => $request->hall_limit ?? 3,
                 'staff_limit' => $request->staff_limit ?? 10,
                 'sms_enabled' => $request->boolean('sms_enabled'),
                 'auto_email_confirmation' => $request->boolean('auto_email_confirmation'),
@@ -140,16 +137,6 @@ class TenantController extends Controller
                 'phone' => $request->owner_phone,
                 'password' => Hash::make($request->owner_password),
             ]);
-
-            // Default Hall
-            Hall::create([
-                'tenant_id' => $tenant->id,
-                'name' => $tenant->name . ' - মূল হল',
-                'capacity' => 500,
-                'price_per_slot' => 30000,
-                'default_server_rate' => 500,
-                'is_active' => true,
-            ]);
         });
 
         return redirect()->route('admin.tenants.index')->with('success', 'নতুন ভেন্ডর সফলভাবে তৈরি করা হয়েছে।');
@@ -162,7 +149,6 @@ class TenantController extends Controller
     {
         $tenant->load([
             'users', 
-            'halls', 
             'bookings' => fn($q) => $q->latest()->take(10), 
             'subscriptionHistories' => fn($q) => $q->latest()->take(10)
         ]);
@@ -170,7 +156,6 @@ class TenantController extends Controller
         $stats = [
             'total_bookings' => $tenant->bookings()->count(),
             'total_revenue' => $tenant->bookings()->sum('total_amount'),
-            'total_halls' => $tenant->halls()->count(),
             'total_users' => $tenant->users()->count(),
         ];
 
@@ -210,7 +195,6 @@ class TenantController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'remove_logo' => 'nullable|boolean',
             'invoice_conditions' => 'nullable|string|max:2000',
-            'hall_limit' => 'nullable|integer|min:1',
             'staff_limit' => 'nullable|integer|min:1',
             // Owner User Validation
             'owner_name' => 'nullable|string|max:255',
@@ -241,7 +225,6 @@ class TenantController extends Controller
             // Merge settings
             $currentSettings = $tenant->settings ?? [];
             $newSettings = [
-                'hall_limit' => $request->filled('hall_limit') ? (int)$request->hall_limit : ($currentSettings['hall_limit'] ?? 5),
                 'staff_limit' => $request->filled('staff_limit') ? (int)$request->staff_limit : ($currentSettings['staff_limit'] ?? 10),
                 'sms_enabled' => $request->has('sms_enabled') ? $request->boolean('sms_enabled') : ($currentSettings['sms_enabled'] ?? false),
                 'auto_email_confirmation' => $request->has('auto_email_confirmation') ? $request->boolean('auto_email_confirmation') : ($currentSettings['auto_email_confirmation'] ?? false),

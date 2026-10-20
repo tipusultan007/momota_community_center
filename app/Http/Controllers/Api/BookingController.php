@@ -14,10 +14,7 @@ class BookingController extends Controller
     use HandlesCommissions;
     public function index(Request $request)
     {
-        $hallId = $request->header('X-Hall-Id');
-
-        $bookings = Booking::with(['customer', 'items.hall', 'items.decorationVendor', 'items.soundVendor', 'items.generatorVendor', 'items.assetAssignments.asset', 'incomes'])
-            ->when($hallId, fn($q) => $q->where('hall_id', $hallId))
+        $bookings = Booking::with(['customer', 'items.decorationVendor', 'items.soundVendor', 'items.generatorVendor', 'items.assetAssignments.asset', 'incomes'])
             ->latest()
             ->get();
 
@@ -29,25 +26,11 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        $defaultHall = \App\Models\Hall::firstOrCreate(
-            ['id' => 1],
-            ['name' => 'মমতা কমিউনিটি সেন্টার', 'capacity' => 500, 'price_per_slot' => 30000, 'is_active' => true]
-        );
-
-        $items = $request->items ?? [];
-        foreach ($items as $k => $item) {
-            if (empty($item['hall_id'])) {
-                $items[$k]['hall_id'] = $defaultHall->id;
-            }
-        }
-        $request->merge(['items' => $items]);
-
         $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
             'customer_address' => 'nullable|string|max:500',
             'items' => 'required|array|min:1',
-            'items.*.hall_id' => 'nullable|exists:halls,id',
             'items.*.event_date' => 'required|date',
             'items.*.slot' => 'required|in:day,night',
             'items.*.is_server_included' => 'nullable|boolean',
@@ -58,7 +41,7 @@ class BookingController extends Controller
         // 1. Check duplicate slots within the same request
         $seenSlots = [];
         foreach ($request->items as $item) {
-            $slotKey = $item['hall_id'] . '_' . $item['event_date'] . '_' . $item['slot'];
+            $slotKey = $item['event_date'] . '_' . $item['slot'];
             if (isset($seenSlots[$slotKey])) {
                 $slotLabel = $item['slot'] === 'day' ? 'দিন (Day)' : 'রাত (Night)';
                 return response()->json([
@@ -74,8 +57,7 @@ class BookingController extends Controller
 
         // 2. Conflict Detection against DB
         foreach ($request->items as $item) {
-            $conflict = \App\Models\BookingItem::where('hall_id', $item['hall_id'])
-                ->whereDate('event_date', $item['event_date'])
+            $conflict = \App\Models\BookingItem::whereDate('event_date', $item['event_date'])
                 ->where('slot', $item['slot'])
                 ->whereHas('booking', function($q) {
                     $q->where('status', '!=', 'cancelled');
@@ -94,14 +76,13 @@ class BookingController extends Controller
             }
         }
 
-        return \DB::transaction(function () use ($request, $defaultHall) {
+        return \DB::transaction(function () use ($request) {
             $customer = \App\Models\Customer::updateOrCreate(
                 ['phone' => $request->customer_phone],
                 ['name' => $request->customer_name, 'address' => $request->customer_address]
             );
 
             $booking = Booking::create([
-                'hall_id' => $defaultHall->id,
                 'customer_id' => $customer->id,
                 'total_amount' => $request->total_amount,
                 'advance_amount' => $request->advance_amount ?? 0,
@@ -111,7 +92,6 @@ class BookingController extends Controller
 
             foreach ($request->items as $item) {
                 $booking->items()->create([
-                    'hall_id' => $item['hall_id'],
                     'event_date' => $item['event_date'],
                     'slot' => $item['slot'],
                     'event_type' => $item['event_type'] ?? 'বিয়ে (Wedding Reception)',
@@ -141,7 +121,6 @@ class BookingController extends Controller
 
             if ($request->advance_amount > 0) {
                 \App\Models\Income::create([
-                    'hall_id' => $booking->hall_id,
                     'amount' => $request->advance_amount,
                     'category' => 'booking',
                     'booking_id' => $booking->id,
@@ -160,7 +139,7 @@ class BookingController extends Controller
 
     public function show(Request $request, $id)
     {
-        $booking = Booking::with(['customer', 'items.hall', 'items.decorationVendor', 'items.soundVendor', 'items.generatorVendor', 'items.assetAssignments.asset', 'incomes'])
+        $booking = Booking::with(['customer', 'items.decorationVendor', 'items.soundVendor', 'items.generatorVendor', 'items.assetAssignments.asset', 'incomes'])
             ->findOrFail($id);
 
         return response()->json([
@@ -171,25 +150,11 @@ class BookingController extends Controller
 
     public function update(Request $request, $id)
     {
-        $defaultHall = \App\Models\Hall::firstOrCreate(
-            ['id' => 1],
-            ['name' => 'মমতা কমিউনিটি সেন্টার', 'capacity' => 500, 'price_per_slot' => 30000, 'is_active' => true]
-        );
-
-        $items = $request->items ?? [];
-        foreach ($items as $k => $item) {
-            if (empty($item['hall_id'])) {
-                $items[$k]['hall_id'] = $defaultHall->id;
-            }
-        }
-        $request->merge(['items' => $items]);
-
         $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
             'customer_address' => 'nullable|string|max:500',
             'items' => 'required|array|min:1',
-            'items.*.hall_id' => 'nullable|exists:halls,id',
             'items.*.event_date' => 'required|date',
             'items.*.slot' => 'required|in:day,night',
             'items.*.is_server_included' => 'nullable|boolean',
@@ -201,7 +166,7 @@ class BookingController extends Controller
         // 1. Check duplicate slots within the same request
         $seenSlots = [];
         foreach ($request->items as $item) {
-            $slotKey = $item['hall_id'] . '_' . $item['event_date'] . '_' . $item['slot'];
+            $slotKey = $item['event_date'] . '_' . $item['slot'];
             if (isset($seenSlots[$slotKey])) {
                 $slotLabel = $item['slot'] === 'day' ? 'দিন (Day)' : 'রাত (Night)';
                 return response()->json([
@@ -217,8 +182,7 @@ class BookingController extends Controller
 
         // 2. Conflict Detection (excluding current booking items)
         foreach ($request->items as $item) {
-            $conflict = \App\Models\BookingItem::where('hall_id', $item['hall_id'])
-                ->whereDate('event_date', $item['event_date'])
+            $conflict = \App\Models\BookingItem::whereDate('event_date', $item['event_date'])
                 ->where('slot', $item['slot'])
                 ->whereHas('booking', function($q) use ($booking) {
                     $q->where('status', '!=', 'cancelled')->where('id', '!=', $booking->id);
@@ -237,7 +201,7 @@ class BookingController extends Controller
             }
         }
 
-        return \DB::transaction(function () use ($request, $booking, $defaultHall) {
+        return \DB::transaction(function () use ($request, $booking) {
             $booking->customer->update([
                 'name' => $request->customer_name,
                 'phone' => $request->customer_phone,
@@ -246,7 +210,6 @@ class BookingController extends Controller
 
             $booking->update([
                 'total_amount' => $request->total_amount,
-                'hall_id' => $defaultHall->id,
                 'notes' => $request->notes,
             ]);
 
@@ -256,7 +219,6 @@ class BookingController extends Controller
             $booking->items()->delete();
             foreach ($request->items as $item) {
                 $booking->items()->create([
-                    'hall_id' => $item['hall_id'],
                     'event_date' => $item['event_date'],
                     'slot' => $item['slot'],
                     'event_type' => $item['event_type'] ?? 'বিয়ে (Wedding Reception)',
@@ -344,7 +306,6 @@ class BookingController extends Controller
 
         \DB::transaction(function () use ($request, $booking) {
             \App\Models\Income::create([
-                'hall_id' => $booking->hall_id,
                 'booking_id' => $booking->id,
                 'amount' => $request->amount,
                 'category' => 'booking',
@@ -387,7 +348,6 @@ class BookingController extends Controller
             );
 
             $expense = \App\Models\Expense::create([
-                'hall_id' => $booking->hall_id,
                 'amount' => $serverCost,
                 'category' => $category->name,
                 'expense_category_id' => $category->id,
@@ -411,7 +371,7 @@ class BookingController extends Controller
 
     public function downloadInvoice(Request $request, $id)
     {
-        $booking = Booking::with(['hall', 'incomes', 'customer', 'items'])
+        $booking = Booking::with(['incomes', 'customer', 'items'])
             ->findOrFail($id);
 
         $pdf = Pdf::loadView('bookings.invoice', ['booking' => $booking], [], [
@@ -439,7 +399,6 @@ class BookingController extends Controller
 
         return \DB::transaction(function () use ($request, $item, $asset) {
             $assignment = $item->assetAssignments()->create([
-                'hall_id' => $item->hall_id,
                 'asset_id' => $request->asset_id,
                 'quantity_out' => $request->quantity,
             ]);
@@ -487,17 +446,12 @@ class BookingController extends Controller
 
     public function checkAvailability(Request $request)
     {
-        $hallId = $request->hall_id ?: (\App\Models\Hall::first()?->id ?? 1);
-        $request->merge(['hall_id' => $hallId]);
-
         $request->validate([
-            'hall_id' => 'required|exists:halls,id',
             'event_date' => 'required|date',
             'slot' => 'required|in:day,night',
         ]);
 
-        $conflict = \App\Models\BookingItem::where('hall_id', $request->hall_id)
-            ->whereDate('event_date', $request->event_date)
+        $conflict = \App\Models\BookingItem::whereDate('event_date', $request->event_date)
             ->where('slot', $request->slot)
             ->whereHas('booking', function ($q) use ($request) {
                 $q->where('status', '!=', 'cancelled');

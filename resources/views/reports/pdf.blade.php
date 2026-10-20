@@ -20,13 +20,13 @@
             border-collapse: collapse;
         }
         
-        .hall-name {
+        .venue-name {
             font-size: 26px;
             font-weight: bold;
             color: #2563eb;
             margin: 0 0 5px 0;
         }
-        .hall-info {
+        .venue-info {
             font-size: 14px;
             color: #64748b;
         }
@@ -134,10 +134,10 @@
     <table width="100%" style="border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 30px;">
         <tr>
             <td width="55%" valign="top">
-                <div class="hall-name">{{ $activeHall->name ?? $tenant->name }}</div>
-                <div class="hall-info">
-                    {{ $activeHall->address ?? 'ঠিকানা উপলব্ধ নেই' }}<br>
-                    ফোন: {{ $toBengali($activeHall->phone ?? 'নেই') }}
+                <div class="venue-name">{{ $tenant->name }}</div>
+                <div class="venue-info">
+                    {{ $tenant->address ?? 'ঠিকানা উপলব্ধ নেই' }}<br>
+                    ফোন: {{ $toBengali($tenant->phone ?? 'নেই') }}
                 </div>
             </td>
             <td width="45%" valign="top" align="right">

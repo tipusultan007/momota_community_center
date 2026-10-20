@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('sms_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id');
             $table->unsignedBigInteger('booking_id')->nullable();
             $table->string('recipient');
             $table->text('message');
@@ -21,8 +20,6 @@ return new class extends Migration
             $table->string('status')->default('sent'); // sent, failed
             $table->text('response')->nullable();
             $table->timestamps();
-
-            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
         });
     }
 

@@ -90,23 +90,6 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <span class="bg-indigo text-white avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21v-13l9 -4l9 4v13" /><path d="M13 21v-9h-2v9" /><path d="M8 21v-7h8v7" /></svg>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="font-weight-medium">মোট হল সংখ্যা</div>
-                            <div class="h2 mb-0">{{ $stats['total_halls'] }} টি</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
                             <span class="bg-purple text-white avatar">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="9" cy="7" r="4" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></svg>
                             </span>
@@ -222,9 +205,6 @@
                             @endif
                         </dd>
 
-                        <dt class="col-5 text-muted">সর্বোচ্চ হল লিমিট:</dt>
-                        <dd class="col-7">{{ $settings['hall_limit'] ?? 5 }} টি</dd>
-
                         <dt class="col-5 text-muted">স্টাফ লিমিট:</dt>
                         <dd class="col-7">{{ $settings['staff_limit'] ?? 10 }} জন</dd>
 
@@ -252,52 +232,8 @@
             @endif
         </div>
 
-        <!-- Right: Halls, Recent Bookings, Subscription History -->
+        <!-- Right: Recent Bookings, Subscription History -->
         <div class="col-lg-8">
-            <!-- Halls List Card -->
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-header bg-transparent border-bottom">
-                    <h3 class="card-title text-dark d-flex align-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21v-13l9 -4l9 4v13" /><path d="M13 21v-9h-2v9" /><path d="M8 21v-7h8v7" /></svg>
-                        কনভেনশন হল সমূহ ({{ $tenant->halls->count() }} টি)
-                    </h3>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-vcenter card-table table-hover">
-                        <thead>
-                            <tr>
-                                <th>হলের নাম</th>
-                                <th>ধারণক্ষমতা</th>
-                                <th>স্লট ভাড়া</th>
-                                <th>সার্ভার রেট</th>
-                                <th>স্ট্যাটাস</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tenant->halls as $hall)
-                            <tr>
-                                <td class="fw-bold">{{ $hall->name }}</td>
-                                <td>{{ number_format($hall->capacity) }} জন</td>
-                                <td>৳ {{ number_format($hall->price_per_slot, 2) }}</td>
-                                <td>৳ {{ number_format($hall->default_server_rate, 2) }}</td>
-                                <td>
-                                    @if($hall->is_active)
-                                        <span class="badge bg-success-lt">সক্রিয়</span>
-                                    @else
-                                        <span class="badge bg-danger-lt">নিষ্ক্রিয়</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-3">কোনো হল পাওয়া যায়নি।</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- Recent Bookings Card -->
             <div class="card border-0 shadow-sm mb-3">
                 <div class="card-header bg-transparent border-bottom">

@@ -16,7 +16,6 @@ class AccountingController extends Controller
     {
         $month = $request->month;
         $year = $request->year;
-        $hallId = $request->header('X-Hall-Id');
         $type = $request->query('type', 'all'); // 'all', 'income', 'expense'
         $perPage = (int) $request->query('per_page', 20);
         $currentPage = (int) $request->query('page', 1);
@@ -35,10 +34,10 @@ class AccountingController extends Controller
         };
 
         // Summary queries with index-friendly date filters
-        $incomeBase = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        $incomeBase = Income::query();
         $applyDateFilter($incomeBase);
 
-        $expenseBase = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        $expenseBase = Expense::query();
         $applyDateFilter($expenseBase);
 
         $totalIncome = (float) (clone $incomeBase)->sum('amount');
@@ -104,25 +103,23 @@ class AccountingController extends Controller
                 ->values();
         }
 
-        // Monthly trends: Cached by hall and year (served in 0.001ms)
+        // Monthly trends: cached by year (served in 0.001ms)
         $currentYear = (int) ($year ?? now()->year);
-        $trendsCacheKey = "acc_trends_{$hallId}_{$currentYear}";
-        $trends = Cache::remember($trendsCacheKey, 300, function () use ($hallId, $currentYear) {
+        $trendsCacheKey = "acc_trends_{$currentYear}";
+        $trends = Cache::remember($trendsCacheKey, 300, function () use ($currentYear) {
             $yearStart = "{$currentYear}-01-01";
             $yearEnd = "{$currentYear}-12-31";
             $monthExpr = DB::getDriverName() === 'sqlite'
                 ? "CAST(strftime('%m', date) AS INTEGER)"
                 : "MONTH(date)";
 
-            $monthlyIncomes = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-                ->whereBetween('date', [$yearStart, $yearEnd])
+            $monthlyIncomes = Income::whereBetween('date', [$yearStart, $yearEnd])
                 ->selectRaw("{$monthExpr} as month_num, SUM(amount) as total")
                 ->groupBy('month_num')
                 ->pluck('total', 'month_num')
                 ->all();
 
-            $monthlyExpenses = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId))
-                ->whereBetween('date', [$yearStart, $yearEnd])
+            $monthlyExpenses = Expense::whereBetween('date', [$yearStart, $yearEnd])
                 ->selectRaw("{$monthExpr} as month_num, SUM(amount) as total")
                 ->groupBy('month_num')
                 ->pluck('total', 'month_num')
@@ -139,10 +136,10 @@ class AccountingController extends Controller
             return $t;
         });
 
-        // Category breakdown: Cached by hall, year, month (served in 0.001ms)
-        $bdCacheKey = "acc_bd_{$hallId}_{$year}_{$month}";
-        $breakdown = Cache::remember($bdCacheKey, 300, function () use ($hallId, $applyDateFilter) {
-            $incQuery = Income::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+        // Category breakdown: cached by year and month (served in 0.001ms)
+        $bdCacheKey = "acc_bd_{$year}_{$month}";
+        $breakdown = Cache::remember($bdCacheKey, 300, function () use ($applyDateFilter) {
+            $incQuery = Income::query();
             $applyDateFilter($incQuery);
             $incCats = $incQuery
                 ->selectRaw('COALESCE(category, "অন্যান্য") as category, SUM(amount) as total')
@@ -150,7 +147,7 @@ class AccountingController extends Controller
                 ->get()
                 ->map(fn($item) => ['category' => $item->category, 'total' => (float) $item->total]);
 
-            $expQuery = Expense::when($hallId, fn($q) => $q->where('hall_id', $hallId));
+            $expQuery = Expense::query();
             $applyDateFilter($expQuery);
             $expCats = $expQuery
                 ->selectRaw('COALESCE(category, "অন্যান্য") as category, SUM(amount) as total')
@@ -193,11 +190,7 @@ class AccountingController extends Controller
             'income_category_id' => 'nullable',
             'category' => 'nullable|string',
             'description' => 'nullable|string',
-            'hall_id' => 'nullable',
         ]);
-
-        $defaultHallId = \App\Models\Hall::first()?->id ?? 1;
-        $hallId = $request->hall_id ?: $defaultHallId;
 
         $incomeCategory = null;
         if ($request->filled('income_category_id')) {
@@ -216,10 +209,9 @@ class AccountingController extends Controller
             'income_category_id' => $incomeCategory->id,
             'category' => $incomeCategory->name,
             'description' => $request->description,
-            'hall_id' => $hallId,
         ]);
 
-        $this->clearAccountingCache($hallId, $request->date);
+        $this->clearAccountingCache($request->date);
 
         return response()->json([
             'status' => 'success',
@@ -236,12 +228,9 @@ class AccountingController extends Controller
             'income_category_id' => 'nullable',
             'category' => 'nullable|string',
             'description' => 'nullable|string',
-            'hall_id' => 'nullable',
         ]);
 
         $income = Income::findOrFail($id);
-        $defaultHallId = \App\Models\Hall::first()?->id ?? 1;
-        $hallId = $request->hall_id ?: ($income->hall_id ?: $defaultHallId);
 
         $incomeCategory = null;
         if ($request->filled('income_category_id')) {
@@ -260,10 +249,9 @@ class AccountingController extends Controller
             'income_category_id' => $incomeCategory->id,
             'category' => $incomeCategory->name,
             'description' => $request->description,
-            'hall_id' => $hallId,
         ]);
 
-        $this->clearAccountingCache($hallId, $request->date);
+        $this->clearAccountingCache($request->date);
 
         return response()->json([
             'status' => 'success',
@@ -284,10 +272,9 @@ class AccountingController extends Controller
             ], 422);
         }
 
-        $hallId = $income->hall_id;
         $date = $income->date;
         $income->delete();
-        $this->clearAccountingCache($hallId, $date);
+        $this->clearAccountingCache($date);
 
         return response()->json([
             'status' => 'success',
@@ -303,11 +290,7 @@ class AccountingController extends Controller
             'expense_category_id' => 'nullable',
             'category' => 'nullable|string',
             'description' => 'nullable|string',
-            'hall_id' => 'nullable',
         ]);
-
-        $defaultHallId = \App\Models\Hall::first()?->id ?? 1;
-        $hallId = $request->hall_id ?: $defaultHallId;
 
         $expenseCategory = null;
         if ($request->filled('expense_category_id')) {
@@ -326,10 +309,9 @@ class AccountingController extends Controller
             'expense_category_id' => $expenseCategory->id,
             'category' => $expenseCategory->name,
             'description' => $request->description,
-            'hall_id' => $hallId,
         ]);
 
-        $this->clearAccountingCache($hallId, $request->date);
+        $this->clearAccountingCache($request->date);
 
         return response()->json([
             'status' => 'success',
@@ -346,12 +328,9 @@ class AccountingController extends Controller
             'expense_category_id' => 'nullable',
             'category' => 'nullable|string',
             'description' => 'nullable|string',
-            'hall_id' => 'nullable',
         ]);
 
         $expense = Expense::findOrFail($id);
-        $defaultHallId = \App\Models\Hall::first()?->id ?? 1;
-        $hallId = $request->hall_id ?: ($expense->hall_id ?: $defaultHallId);
 
         $expenseCategory = null;
         if ($request->filled('expense_category_id')) {
@@ -370,10 +349,9 @@ class AccountingController extends Controller
             'expense_category_id' => $expenseCategory->id,
             'category' => $expenseCategory->name,
             'description' => $request->description,
-            'hall_id' => $hallId,
         ]);
 
-        $this->clearAccountingCache($hallId, $request->date);
+        $this->clearAccountingCache($request->date);
 
         return response()->json([
             'status' => 'success',
@@ -385,10 +363,9 @@ class AccountingController extends Controller
     public function deleteExpense(Request $request, $id)
     {
         $expense = Expense::findOrFail($id);
-        $hallId = $expense->hall_id;
         $date = $expense->date;
         $expense->delete();
-        $this->clearAccountingCache($hallId, $date);
+        $this->clearAccountingCache($date);
 
         return response()->json([
             'status' => 'success',
@@ -486,21 +463,15 @@ class AccountingController extends Controller
         ]);
     }
 
-    private function clearAccountingCache($hallId = null, $date = null)
+    private function clearAccountingCache($date = null)
     {
         $year = $date ? Carbon::parse($date)->year : now()->year;
         $month = $date ? Carbon::parse($date)->month : now()->month;
 
-        if ($hallId) {
-            Cache::forget("acc_trends_{$hallId}_{$year}");
-            Cache::forget("acc_bd_{$hallId}_{$year}_{$month}");
-            Cache::forget("acc_bd_{$hallId}__{$month}");
-            Cache::forget("acc_bd_{$hallId}_{$year}_");
-            Cache::forget("acc_bd_{$hallId}__");
-        }
-        Cache::forget("acc_trends__{$year}");
-        Cache::forget("acc_bd___{$month}");
-        Cache::forget("acc_bd__{$year}_");
-        Cache::forget("acc_bd___");
+        Cache::forget("acc_trends_{$year}");
+        Cache::forget("acc_bd_{$year}_{$month}");
+        Cache::forget("acc_bd__{$month}");
+        Cache::forget("acc_bd_{$year}_");
+        Cache::forget("acc_bd__");
     }
 }

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.majesticsuite.majestic_concierge"
+    namespace = "com.umairit.momota_community_center"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.majesticsuite.majestic_concierge"
+        applicationId = "com.umairit.momota_community_center"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

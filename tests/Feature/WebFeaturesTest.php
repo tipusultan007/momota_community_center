@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\BusinessSetting;
-use App\Models\Hall;
 use App\Models\Customer;
 use App\Models\IncomeCategory;
 use App\Models\ExpenseCategory;
@@ -16,7 +15,6 @@ class WebFeaturesTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-    protected Hall $hall;
 
     protected function setUp(): void
     {
@@ -28,15 +26,11 @@ class WebFeaturesTest extends TestCase
                 'company_name' => 'গ্র্যান্ড প্যালেস কনভেনশন হল',
                 'phone' => '01711112222',
                 'address' => 'ঢাকা, বাংলাদেশ',
+                'capacity' => 800,
+                'price_per_slot' => 50000,
+                'default_server_rate' => 500,
             ]
         );
-
-        $this->hall = Hall::create([
-            'name' => 'রয়েল ব্যাঙ্কোয়েট হল',
-            'capacity' => 800,
-            'price_per_slot' => 50000,
-            'is_active' => true,
-        ]);
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
@@ -54,12 +48,6 @@ class WebFeaturesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_web_halls_redirects_to_dashboard(): void
-    {
-        $response = $this->actingAs($this->user)->get('/halls');
-        $response->assertRedirect(route('dashboard'));
-    }
-
     public function test_web_bookings_full_lifecycle(): void
     {
         // 1. Create screen
@@ -75,7 +63,6 @@ class WebFeaturesTest extends TestCase
             'advance_amount' => 10000,
             'items' => [
                 [
-                    'hall_id' => $this->hall->id,
                     'event_date' => '2026-11-20',
                     'slot' => 'day',
                     'base_price' => 50000,
@@ -92,7 +79,6 @@ class WebFeaturesTest extends TestCase
             'total_amount' => 50000,
             'items' => [
                 [
-                    'hall_id' => $this->hall->id,
                     'event_date' => '2026-11-20',
                     'slot' => 'day',
                     'base_price' => 50000,

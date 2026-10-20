@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
-            $table->foreignId('hall_id')->nullable()->constrained('halls')->nullOnDelete();
-            
+
             $table->morphs('transactionable'); // transactionable_id, transactionable_type
             
             $table->enum('type', ['income', 'expense', 'salary', 'commission']);

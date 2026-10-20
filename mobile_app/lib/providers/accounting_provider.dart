@@ -198,7 +198,6 @@ class AccountingProvider with ChangeNotifier {
             description: data['description']?.toString(),
             categoryName: _getCategoryName(type, catId) ?? 'N/A',
             categoryId: catId != null ? int.tryParse(catId.toString()) ?? 0 : 0,
-            hallId: data['hall_id'] != null ? int.tryParse(data['hall_id'].toString()) : null,
           );
           _transactions.insert(0, optimisticTx);
           if (type == 'income') {
@@ -244,7 +243,6 @@ class AccountingProvider with ChangeNotifier {
               description: data['description']?.toString() ?? old.description,
               categoryName: _getCategoryName(type, catId) ?? old.categoryName,
               categoryId: catId != null ? int.tryParse(catId.toString()) ?? old.categoryId : old.categoryId,
-              hallId: data['hall_id'] != null ? int.tryParse(data['hall_id'].toString()) : old.hallId,
             );
             notifyListeners();
           }

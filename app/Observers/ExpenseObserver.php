@@ -39,7 +39,6 @@ class ExpenseObserver
                 'transactionable_type' => Expense::class,
             ],
             [
-                'hall_id' => $expense->hall_id,
                 'type' => 'expense',
                 'amount' => $expense->amount,
                 'date' => $expense->date ?? $expense->created_at,

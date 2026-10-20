@@ -2,8 +2,6 @@ import 'asset_assignment.dart';
 
 class BookingItem {
   final int? id;
-  final int hallId;
-  final String hallName;
   final String eventDate;
   final String slot;
   final String eventType;
@@ -32,8 +30,6 @@ class BookingItem {
 
   BookingItem({
     this.id,
-    required this.hallId,
-    this.hallName = '',
     required this.eventDate,
     required this.slot,
     this.eventType = 'বিয়ে (Wedding Reception)',
@@ -64,8 +60,6 @@ class BookingItem {
   factory BookingItem.fromJson(Map<String, dynamic> json) {
     return BookingItem(
       id: _toInt(json['id']),
-      hallId: _toInt(json['hall_id']),
-      hallName: json['hall']?['name'] ?? 'N/A',
       eventDate: _parseDate(json['event_date']),
       slot: json['slot'] ?? 'day',
       eventType: json['event_type'] ?? 'বিয়ে (Wedding Reception)',
@@ -98,8 +92,6 @@ class BookingItem {
 
   BookingItem copyWith({
     int? id,
-    int? hallId,
-    String? hallName,
     String? eventDate,
     String? slot,
     String? eventType,
@@ -128,8 +120,6 @@ class BookingItem {
   }) {
     return BookingItem(
       id: id ?? this.id,
-      hallId: hallId ?? this.hallId,
-      hallName: hallName ?? this.hallName,
       eventDate: eventDate ?? this.eventDate,
       slot: slot ?? this.slot,
       eventType: eventType ?? this.eventType,
@@ -172,7 +162,6 @@ class BookingItem {
 
   Map<String, dynamic> toJson() {
     return {
-      'hall_id': hallId,
       'event_date': eventDate,
       'slot': slot,
       'event_type': eventType,

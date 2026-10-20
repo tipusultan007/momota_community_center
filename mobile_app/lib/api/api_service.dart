@@ -28,7 +28,6 @@ class ApiService {
   }
 
   String? _cachedToken;
-  String? _cachedActiveHallId;
 
   Future<String?> getToken() async {
     if (_cachedToken != null) return _cachedToken;
@@ -36,23 +35,12 @@ class ApiService {
     return _cachedToken;
   }
 
-  Future<String?> getActiveHallId() async {
-    if (_cachedActiveHallId != null) return _cachedActiveHallId;
-    _cachedActiveHallId = await _storage.read(key: 'active_hall_id');
-    return _cachedActiveHallId;
-  }
-
   void updateToken(String? token) {
     _cachedToken = token;
   }
 
-  void updateActiveHallId(String? hallId) {
-    _cachedActiveHallId = hallId;
-  }
-
   void clearAuthCache() {
     _cachedToken = null;
-    _cachedActiveHallId = null;
   }
 
   ApiService._internal() {
@@ -72,12 +60,7 @@ class ApiService {
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
-        
-        final activeHallId = await getActiveHallId();
-        if (activeHallId != null && !options.headers.containsKey('X-Hall-Id')) {
-          options.headers['X-Hall-Id'] = activeHallId;
-        }
-        
+
         return handler.next(options);
       },
       onError: (DioException e, handler) async {
@@ -133,13 +116,12 @@ class ApiService {
   final Map<String, dynamic> _memoryCache = {};
 
   Future<String> _generateCacheKey(String path, Map<String, dynamic>? queryParameters) async {
-    final activeHallId = await getActiveHallId() ?? 'default';
     final normalizedPath = path.startsWith('/') ? path : '/$path';
     if (queryParameters == null || queryParameters.isEmpty) {
-      return '[$activeHallId]$normalizedPath';
+      return normalizedPath;
     }
     final sortedQuery = Uri(queryParameters: queryParameters.map((k, v) => MapEntry(k, v.toString()))).query;
-    return '[$activeHallId]$normalizedPath?$sortedQuery';
+    return '$normalizedPath?$sortedQuery';
   }
 
   // Instant local cache getter (Memory first, then SQLite)
@@ -235,12 +217,6 @@ class ApiService {
             statusCode: 200,
             requestOptions: RequestOptions(path: cleanPath),
           );
-        } else if (cleanPath.contains('halls')) {
-          return Response(
-            data: {'data': []},
-            statusCode: 200,
-            requestOptions: RequestOptions(path: cleanPath),
-          );
         }
       }
 
@@ -288,8 +264,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await getActiveHallId();
-        await DatabaseService.instance.addToQueue('POST', cleanPath, data, hallId: activeHallId);
+        await DatabaseService.instance.addToQueue('POST', cleanPath, data);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
         return Response(
@@ -312,8 +287,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await getActiveHallId();
-        await DatabaseService.instance.addToQueue('PUT', cleanPath, data, hallId: activeHallId);
+        await DatabaseService.instance.addToQueue('PUT', cleanPath, data);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
         return Response(
@@ -336,8 +310,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await getActiveHallId();
-        await DatabaseService.instance.addToQueue('PATCH', cleanPath, data, hallId: activeHallId);
+        await DatabaseService.instance.addToQueue('PATCH', cleanPath, data);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
         return Response(
@@ -360,8 +333,7 @@ class ApiService {
     } catch (e) {
       if (_isOfflineError(e)) {
         isOnline.value = false;
-        final activeHallId = await getActiveHallId();
-        await DatabaseService.instance.addToQueue('DELETE', cleanPath, queryParameters, hallId: activeHallId);
+        await DatabaseService.instance.addToQueue('DELETE', cleanPath, queryParameters);
         await _refreshPendingCount();
         _invalidateRelatedCaches(cleanPath);
         return Response(
@@ -392,22 +364,16 @@ class ApiService {
           final method = item['method'];
           final path = item['path'];
           final body = item['body'] != null ? jsonDecode(item['body']) : null;
-          final hallId = item['hall_id'];
-
-          final options = Options();
-          if (hallId != null) {
-            options.headers = {'X-Hall-Id': hallId};
-          }
 
           Response? response;
           if (method == 'POST') {
-            response = await _dio.post(path, data: body, options: options);
+            response = await _dio.post(path, data: body);
           } else if (method == 'PUT') {
-            response = await _dio.put(path, data: body, options: options);
+            response = await _dio.put(path, data: body);
           } else if (method == 'PATCH') {
-            response = await _dio.patch(path, data: body, options: options);
+            response = await _dio.patch(path, data: body);
           } else if (method == 'DELETE') {
-            response = await _dio.delete(path, options: options);
+            response = await _dio.delete(path);
           }
 
           if (response != null && (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204)) {

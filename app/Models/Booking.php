@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
-use App\Traits\BelongsToHall;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    use BelongsToTenant, BelongsToHall;
+    use BelongsToTenant;
 
     protected $fillable = [
-        'hall_id',
         'customer_id',
         'total_amount',
         'advance_amount',
@@ -26,7 +24,7 @@ class Booking extends Model
         'total_server_cost',
         'excluded_server_cost',
         'all_server_cost',
-        'hall_income_amount',
+        'venue_income_amount',
     ];
 
     public function getTenantAttribute(): BusinessSetting
@@ -47,11 +45,6 @@ class Booking extends Model
     public function commissions()
     {
         return $this->hasMany(Commission::class);
-    }
-
-    public function hall()
-    {
-        return $this->belongsTo(Hall::class);
     }
 
     public function incomes()
@@ -85,7 +78,7 @@ class Booking extends Model
         });
     }
 
-    public function getHallIncomeAmountAttribute(): float
+    public function getVenueIncomeAmountAttribute(): float
     {
         return max(0, (float) ($this->total_amount - $this->total_server_cost));
     }

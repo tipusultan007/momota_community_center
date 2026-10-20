@@ -53,8 +53,6 @@ class BookingProvider with ChangeNotifier {
           final itemsList = (data['items'] as List? ?? []).map((i) {
             if (i is BookingItem) return i;
             return BookingItem(
-              hallId: i['hall_id'] ?? 0,
-              hallName: i['hall_name'] ?? '',
               eventDate: i['event_date'] ?? '',
               slot: i['slot'] ?? 'day',
               serverCount: i['server_count'] ?? 0,

@@ -10,7 +10,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\HallController;
 use App\Http\Controllers\IncomeCategoryController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ProfileController;
@@ -19,11 +18,13 @@ use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome', [
+        'venue' => \App\Models\BusinessSetting::get(),
+    ]);
 });
 
 Route::middleware('auth')->group(function () {
-    Route::middleware(['tenant', 'hall'])->group(function () {
+    Route::middleware(['tenant'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['verified'])->name('dashboard');
         
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,9 +38,6 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('subscription')->group(function () {
             
-            // Hall management disabled - system is dedicated to single convention hall
-            Route::any('halls/{any?}', fn() => redirect()->route('dashboard'))->where('any', '.*');
-
             Route::middleware('can:manage-bookings')->group(function() {
                 Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
                 Route::get('calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
@@ -69,6 +67,9 @@ Route::middleware('auth')->group(function () {
                 Route::resource('expense-categories', ExpenseCategoryController::class);
                 Route::resource('incomes', IncomeController::class);
                 Route::resource('expenses', ExpenseController::class);
+                Route::resource('loans', \App\Http\Controllers\LoanController::class);
+                Route::post('loans/{loan}/payments', [\App\Http\Controllers\LoanController::class, 'addPayment'])->name('loans.payments.store');
+                Route::delete('loans/payments/{payment}', [\App\Http\Controllers\LoanController::class, 'destroyPayment'])->name('loans.payments.destroy');
                 Route::get('accounting', [AccountingController::class, 'index'])->name('accounting.index');
                 Route::get('transactions/export', [\App\Http\Controllers\TransactionController::class, 'exportPdf'])->name('transactions.export');
                 Route::get('transactions', [\App\Http\Controllers\TransactionController::class, 'index'])->name('transactions.index');

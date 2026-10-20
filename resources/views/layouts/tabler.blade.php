@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>{{ $title ?? 'ড্যাশবোর্ড' }} | {{ config('app.name', 'SaaS Hall') }}</title>
+    <title>{{ $title ?? 'ড্যাশবোর্ড' }} | {{ config('app.name', 'মমতা কমিউনিটি সেন্টার') }}</title>
     <!-- CSS files -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-vendors.min.css">
@@ -211,8 +211,8 @@
 
               @can('manage-financials')
               <li
-                x-data="{ open: {{ request()->routeIs('transactions.*') || request()->routeIs('accounting.*') || request()->routeIs('income-categories.*') || request()->routeIs('expense-categories.*') || request()->routeIs('incomes.*') || request()->routeIs('expenses.*') || request()->routeIs('vendors.*') || request()->routeIs('commissions.*') || request()->routeIs('assets.*') ? 'true' : 'false' }} }"
-                class="nav-item dropdown {{ request()->routeIs('transactions.*') || request()->routeIs('accounting.*') || request()->routeIs('income-categories.*') || request()->routeIs('expense-categories.*') || request()->routeIs('incomes.*') || request()->routeIs('expenses.*') || request()->routeIs('vendors.*') || request()->routeIs('commissions.*') || request()->routeIs('assets.*') ? 'active' : '' }}"
+                x-data="{ open: {{ request()->routeIs('transactions.*') || request()->routeIs('accounting.*') || request()->routeIs('income-categories.*') || request()->routeIs('expense-categories.*') || request()->routeIs('incomes.*') || request()->routeIs('expenses.*') || request()->routeIs('loans.*') || request()->routeIs('vendors.*') || request()->routeIs('commissions.*') || request()->routeIs('assets.*') ? 'true' : 'false' }} }"
+                class="nav-item dropdown {{ request()->routeIs('transactions.*') || request()->routeIs('accounting.*') || request()->routeIs('income-categories.*') || request()->routeIs('expense-categories.*') || request()->routeIs('incomes.*') || request()->routeIs('expenses.*') || request()->routeIs('loans.*') || request()->routeIs('vendors.*') || request()->routeIs('commissions.*') || request()->routeIs('assets.*') ? 'active' : '' }}"
               >
                 <a
                   class="nav-link dropdown-toggle"
@@ -234,6 +234,10 @@
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item fw-bold text-success {{ request()->routeIs('incomes.*') ? 'active' : '' }}" href="{{ route('incomes.index') }}">আয় ব্যবস্থাপনা</a>
                   <a class="dropdown-item fw-bold text-danger {{ request()->routeIs('expenses.*') ? 'active' : '' }}" href="{{ route('expenses.index') }}">ব্যয় ব্যবস্থাপনা</a>
+                  <a class="dropdown-item fw-bold text-primary {{ request()->routeIs('loans.*') ? 'active' : '' }}" href="{{ route('loans.index') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-1 text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                    হাওলাত / ঋণ (ধার-দেনা)
+                  </a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item {{ request()->routeIs('income-categories.*') ? 'active' : '' }}" href="{{ route('income-categories.index') }}">আয় ক্যাটাগরি</a>
                   <a class="dropdown-item {{ request()->routeIs('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}">ব্যয় ক্যাটাগরি</a>

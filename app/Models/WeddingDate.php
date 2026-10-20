@@ -22,14 +22,11 @@ class WeddingDate extends Model
     ];
 
     /**
-     * Check booking status for a specific hall on this date.
+     * Check booking status for this venue on this date.
      */
-    public function getAvailabilityStatus($hallId = null): array
+    public function getAvailabilityStatus(): array
     {
-        $hallId = $hallId ?? session('active_hall_id') ?? Hall::first()?->id;
-
-        $items = BookingItem::where('hall_id', $hallId)
-            ->whereDate('event_date', $this->date)
+        $items = BookingItem::whereDate('event_date', $this->date)
             ->whereHas('booking', fn($q) => $q->where('status', '!=', 'cancelled'))
             ->get();
 

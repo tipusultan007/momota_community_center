@@ -62,7 +62,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between text-primary font-weight-bold">
                                         <span>হলের প্রাক্কলিত নিট আয়:</span>
-                                        <span>৳ {{ number_format($booking->hall_income_amount, 2) }}</span>
+                                        <span>৳ {{ number_format($booking->venue_income_amount, 2) }}</span>
                                     </div>
                                 </div>
                             @endif

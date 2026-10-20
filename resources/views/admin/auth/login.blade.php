@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>সুপার এডমিন লগইন | {{ config('app.name', 'PranganHQ') }}</title>
+    <title>সুপার এডমিন লগইন | {{ config('app.name', 'Momota Community Center') }}</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,7 +103,7 @@
                         </div>
                         <div>
                             <span class="text-2xl font-black tracking-tight text-white block leading-none">
-                                {{ config('app.name', 'PranganHQ') }}
+                                {{ config('app.name', 'Momota Community Center') }}
                             </span>
                             <span class="text-[11px] font-bold uppercase tracking-widest text-brand-400 font-mono mt-1 block">
                                 Core Administration
@@ -355,7 +355,7 @@
 
         <!-- Copyright Footer -->
         <div class="mt-6 text-center text-xs text-slate-400 flex items-center justify-center gap-4">
-            <span>&copy; {{ date('Y') }} {{ config('app.name', 'PranganHQ') }}. সর্বস্বত্ব সংরক্ষিত।</span>
+            <span>&copy; {{ date('Y') }} {{ config('app.name', 'Momota Community Center') }}. সর্বস্বত্ব সংরক্ষিত।</span>
             <span class="inline-block w-1 h-1 rounded-full bg-slate-700"></span>
             <span class="font-mono text-slate-400">Enterprise Edition v2.4</span>
         </div>

@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
-use App\Traits\BelongsToHall;
 use Illuminate\Database\Eloquent\Model;
 
 class Expense extends Model
 {
-    use BelongsToTenant, BelongsToHall;
+    use BelongsToTenant;
 
     protected $fillable = [
-        'hall_id',
         'amount',
         'category',
         'expense_category_id',

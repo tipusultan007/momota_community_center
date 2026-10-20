@@ -80,9 +80,6 @@
                                                         <input type="date" :name="'items['+index+'][event_date]'" class="form-control" x-model="item.event_date" @change="checkAllAvailability()" @input="checkAllAvailability()" required>
                                                     </div>
                                                     <div class="mb-2">
-                                                        <input type="hidden" :name="'items['+index+'][hall_id]'" :value="item.hall_id">
-                                                    </div>
-                                                    <div class="mb-2">
                                                         <label class="form-label small">স্লট</label>
                                                         <select :name="'items['+index+'][slot]'" class="form-control" x-model="item.slot" @change="checkAllAvailability()" required>
                                                             <option value="day">Day (দিন)</option>
@@ -265,26 +262,25 @@
     <script>
         function bookingForm() {
             return {
-                items: {!! json_encode(array_map(function($item) use ($hall) {
+                items: {!! json_encode(array_map(function($item) use ($business) {
                     $item['slot'] = ($item['slot'] ?? '') === 'night' || ($item['slot'] ?? '') === 'evening' ? 'night' : 'day';
                     $item['conflict_error'] = '';
                     $item['is_ac'] = !empty($item['is_ac']) && $item['is_ac'] !== 'false';
                     $item['extra_sound'] = !empty($item['extra_sound']) && $item['extra_sound'] !== 'false';
                     $item['extra_generator'] = !empty($item['extra_generator']) && $item['extra_generator'] !== 'false';
                     $item['extra_decoration'] = !empty($item['extra_decoration']) && $item['extra_decoration'] !== 'false';
-                    $item['base_price'] = (float)($item['base_price'] ?? $hall->price_per_slot ?? 0);
+                    $item['base_price'] = (float)($item['base_price'] ?? $business->price_per_slot ?? 0);
                     $item['sub_total'] = (float)($item['sub_total'] ?? $item['base_price']);
                     return $item;
                 }, old('items', [
                     [
                         'event_date' => date('Y-m-d'),
-                        'hall_id' => $hall->id,
                         'slot' => 'day',
                         'event_type' => 'বিয়ে (Wedding Reception)',
                         'guest_count' => 0,
                         'table_count' => 0,
                         'server_count' => 0,
-                        'server_rate' => $hall->default_server_rate ?? 500,
+                        'server_rate' => $business->default_server_rate ?? 500,
                         'is_server_included' => true,
                         'is_ac' => false,
                         'ac_price' => 0,
@@ -297,8 +293,8 @@
                         'extra_decoration' => false,
                         'decoration_vendor_id' => '',
                         'decoration_price' => 0,
-                        'base_price' => $hall->price_per_slot ?? 0,
-                        'sub_total' => $hall->price_per_slot ?? 0,
+                        'base_price' => $business->price_per_slot ?? 0,
+                        'sub_total' => $business->price_per_slot ?? 0,
                         'conflict_error' => '',
                     ]
                 ]))) !!},
@@ -308,7 +304,7 @@
                     this.checkAllAvailability();
                 },
                 addItem() {
-                    let defaultBasePrice = {{ $hall->price_per_slot ?? 0 }};
+                    let defaultBasePrice = {{ $business->price_per_slot ?? 0 }};
                     let lastItem = this.items.length > 0 ? this.items[this.items.length - 1] : null;
                     let nextSlot = 'day';
                     let nextDate = '';
@@ -319,13 +315,12 @@
 
                     this.items.push({
                         event_date: nextDate,
-                        hall_id: {{ $hall->id }},
                         slot: nextSlot,
                         event_type: 'বিয়ে (Wedding Reception)',
                         guest_count: 0,
                         table_count: 0,
                         server_count: 0,
-                        server_rate: {{ $hall->default_server_rate ?? 500 }},
+                        server_rate: {{ $business->default_server_rate ?? 500 }},
                         is_server_included: true,
                         is_ac: false,
                         ac_price: 0,
@@ -360,7 +355,7 @@
                     let item = this.items[index];
                     if (!item) return;
 
-                    if (!item.event_date || !item.slot || !item.hall_id) {
+                    if (!item.event_date || !item.slot) {
                         item.conflict_error = '';
                         return;
                     }
@@ -369,7 +364,7 @@
                     let duplicate = this.items.some((other, oIdx) => {
                         if (oIdx === index) return false;
                         if (!other.event_date || !other.slot) return false;
-                        return other.event_date === item.event_date && other.slot === item.slot && String(other.hall_id) === String(item.hall_id);
+                        return other.event_date === item.event_date && other.slot === item.slot;
                     });
 
                     if (duplicate) {
@@ -385,7 +380,7 @@
 
                     // 2. Check conflict against database
                     try {
-                        let res = await fetch(`{{ route('bookings.check-availability') }}?hall_id=${item.hall_id}&event_date=${item.event_date}&slot=${item.slot}`);
+                        let res = await fetch(`{{ route('bookings.check-availability') }}?event_date=${item.event_date}&slot=${item.slot}`);
                         let data = await res.json();
                         if (!data.available) {
                             item.conflict_error = data.message;
@@ -393,7 +388,7 @@
                             let isDupNow = this.items.some((other, oIdx) => {
                                 if (oIdx === index) return false;
                                 if (!other.event_date || !other.slot) return false;
-                                return other.event_date === item.event_date && other.slot === item.slot && String(other.hall_id) === String(item.hall_id);
+                                return other.event_date === item.event_date && other.slot === item.slot;
                             });
                             if (!isDupNow) {
                                 item.conflict_error = '';

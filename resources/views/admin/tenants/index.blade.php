@@ -192,7 +192,6 @@
                             @endif
                         </td>
                         <td>
-                            <div><span class="badge bg-blue-lt">{{ $tenant->halls_count }} টি হল</span></div>
                             <div class="small text-muted mt-1"><span class="badge bg-green-lt">{{ $tenant->bookings_count }} টি বুকিং</span></div>
                         </td>
                         <td>

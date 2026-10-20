@@ -2,16 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToHall;
 use Illuminate\Database\Eloquent\Model;
 
 class BookingItem extends Model
 {
-    use BelongsToHall;
-
     protected $fillable = [
         'booking_id',
-        'hall_id',
         'event_date',
         'slot',
         'event_type',
@@ -43,11 +39,6 @@ class BookingItem extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class);
-    }
-
-    public function hall()
-    {
-        return $this->belongsTo(Hall::class);
     }
 
     public function decorationVendor()

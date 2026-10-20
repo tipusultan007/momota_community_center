@@ -85,7 +85,7 @@
     </div>
 
     <div style="margin-top: 50px; font-size: 12px; color: #6b7280; text-align: center;">
-        Generated on {{ now()->toDateTimeString() }} by PranganHQ
+        Generated on {{ now()->toDateTimeString() }} by Momota Community Center
     </div>
 </body>
 </html>

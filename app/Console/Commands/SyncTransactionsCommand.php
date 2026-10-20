@@ -40,7 +40,6 @@ class SyncTransactionsCommand extends Command
                 $income->transaction()->updateOrCreate(
                     [],
                     [
-                        'hall_id' => $income->hall_id,
                         'type' => 'income',
                         'amount' => $income->amount,
                         'date' => $income->date ?? $income->created_at,
@@ -61,7 +60,6 @@ class SyncTransactionsCommand extends Command
                 $expense->transaction()->updateOrCreate(
                     [],
                     [
-                        'hall_id' => $expense->hall_id,
                         'type' => 'expense',
                         'amount' => $expense->amount,
                         'date' => $expense->date ?? $expense->created_at,
@@ -82,7 +80,6 @@ class SyncTransactionsCommand extends Command
                 $salary->transaction()->updateOrCreate(
                     [],
                     [
-                        'hall_id' => null,
                         'type' => 'salary',
                         'amount' => $salary->amount,
                         'date' => $salary->payment_date ?? $salary->created_at,
@@ -103,7 +100,6 @@ class SyncTransactionsCommand extends Command
                 $commission->transaction()->updateOrCreate(
                     [],
                     [
-                        'hall_id' => $commission->booking ? $commission->booking->hall_id : null,
                         'type' => 'commission',
                         'amount' => $commission->net_payout ?? $commission->amount,
                         'date' => $commission->updated_at ?? $commission->created_at,

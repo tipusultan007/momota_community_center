@@ -33,11 +33,6 @@ class Tenant extends Model
         return $this->hasMany(User::class);
     }
 
-    public function halls()
-    {
-        return $this->hasMany(Hall::class);
-    }
-
     public function bookings()
     {
         return $this->hasMany(Booking::class);

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('commissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 12, 2);

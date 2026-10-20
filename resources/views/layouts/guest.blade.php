@@ -90,7 +90,7 @@
         <div class="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4">
             <a href="/" class="flex flex-col items-center group">
                 <span class="text-4xl font-black tracking-tighter text-primary-container mb-1 group-hover:text-secondary transition-colors duration-300">
-                    {{ config('app.name', 'PranganHQ') }}
+                    {{ config('app.name', 'Momota Community Center') }}
                 </span>
                 <span class="text-[10px] uppercase tracking-[0.3em] text-on-surface-variant font-bold">Event Management Platform</span>
             </a>

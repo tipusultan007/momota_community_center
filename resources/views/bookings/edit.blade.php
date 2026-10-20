@@ -70,7 +70,6 @@
                                                         <label class="form-label small">বুকিং তারিখ</label>
                                                         <input type="date" :name="'items['+index+'][event_date]'" class="form-control" x-model="item.event_date" @change="checkAllAvailability()" @input="checkAllAvailability()" required>
                                                     </div>
-                                                    <input type="hidden" :name="'items['+index+'][hall_id]'" :value="item.hall_id">
                                                     <div class="mb-2">
                                                         <label class="form-label small">স্লট</label>
                                                         <select :name="'items['+index+'][slot]'" class="form-control" x-model="item.slot" @change="checkAllAvailability()" required>
@@ -259,7 +258,6 @@
             return {
                 items: @js($booking->items->map(fn($i) => [
                     'event_date' => $i->event_date->format('Y-m-d'),
-                    'hall_id' => $i->hall_id,
                     'slot' => ($i->slot === 'night' || $i->slot === 'evening') ? 'night' : 'day',
                     'event_type' => match($i->event_type) {
                         'Wedding' => 'বিয়ে (Wedding Reception)',
@@ -295,7 +293,7 @@
                     this.checkAllAvailability();
                 },
                 addItem() {
-                    let defaultBasePrice = {{ $hall->price_per_slot ?? 0 }};
+                    let defaultBasePrice = {{ $business->price_per_slot ?? 0 }};
                     let lastItem = this.items.length > 0 ? this.items[this.items.length - 1] : null;
                     let nextSlot = 'day';
                     let nextDate = '';
@@ -306,13 +304,12 @@
 
                     this.items.push({
                         event_date: nextDate,
-                        hall_id: {{ $hall->id }},
                         slot: nextSlot,
                         event_type: 'বিয়ে (Wedding Reception)',
                         guest_count: 0,
                         table_count: 0,
                         server_count: 0,
-                        server_rate: {{ $hall->default_server_rate ?? 500 }},
+                        server_rate: {{ $business->default_server_rate ?? 500 }},
                         is_server_included: true,
                         is_ac: false,
                         ac_price: 0,
@@ -347,7 +344,7 @@
                     let item = this.items[index];
                     if (!item) return;
 
-                    if (!item.event_date || !item.slot || !item.hall_id) {
+                    if (!item.event_date || !item.slot) {
                         item.conflict_error = '';
                         return;
                     }
@@ -356,7 +353,7 @@
                     let duplicate = this.items.some((other, oIdx) => {
                         if (oIdx === index) return false;
                         if (!other.event_date || !other.slot) return false;
-                        return other.event_date === item.event_date && other.slot === item.slot && String(other.hall_id) === String(item.hall_id);
+                        return other.event_date === item.event_date && other.slot === item.slot;
                     });
 
                     if (duplicate) {
@@ -372,7 +369,7 @@
 
                     // 2. Check conflict against database
                     try {
-                        let res = await fetch(`{{ route('bookings.check-availability') }}?hall_id=${item.hall_id}&event_date=${item.event_date}&slot=${item.slot}&exclude_booking_id={{ $booking->id }}`);
+                        let res = await fetch(`{{ route('bookings.check-availability') }}?event_date=${item.event_date}&slot=${item.slot}&exclude_booking_id={{ $booking->id }}`);
                         let data = await res.json();
                         if (!data.available) {
                             item.conflict_error = data.message;
@@ -380,7 +377,7 @@
                             let isDupNow = this.items.some((other, oIdx) => {
                                 if (oIdx === index) return false;
                                 if (!other.event_date || !other.slot) return false;
-                                return other.event_date === item.event_date && other.slot === item.slot && String(other.hall_id) === String(item.hall_id);
+                                return other.event_date === item.event_date && other.slot === item.slot;
                             });
                             if (!isDupNow) {
                                 item.conflict_error = '';

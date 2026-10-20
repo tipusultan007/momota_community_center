@@ -39,7 +39,6 @@ class CommissionObserver
                 'transactionable_type' => Commission::class,
             ],
             [
-                'hall_id' => $commission->booking ? $commission->booking->hall_id : null,
                 'type' => 'commission',
                 'amount' => $commission->net_payout ?? $commission->amount,
                 'date' => $commission->updated_at ?? $commission->created_at,
