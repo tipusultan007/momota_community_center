@@ -64,33 +64,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 Text(
-                  'মমতা কমিউনিটি সেন্টার\nMomota Community Center',
+                  'মমতা কমিউনিটি সেন্টার',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.manrope(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
                     color: AppTheme.textNavy,
                     letterSpacing: -0.5,
-                    height: 1.15,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'আপনার প্রিমিয়াম ইভেন্ট ম্যানেজমেন্ট গেটওয়েতে লগইন করুন।',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w600,
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 36),
                 Container(
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
