@@ -16,6 +16,8 @@ class CalendarController extends Controller
             ->where('event_date', '>=', now())
             ->orderBy('event_date', 'asc')
             ->take(5)
+            ->get();
+
         $businessSetting = \App\Models\BusinessSetting::get();
             
         return view('calendar.index', compact('upcomingBookings', 'businessSetting'));
