@@ -37,66 +37,79 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   final Map<int, String?> _conflictErrors = {};
   bool _isLoading = true;
   bool _isSaving = false;
-  final List<String> _eventTypes = [
-    'বিয়ে (Wedding Reception)',
-    'গায়ে হলুদ (Gaye Holud)',
-    'মেহেদি নাইট (Mehendi Night)',
-    'আকদ / এনগেজমেন্ট (Akht / Engagement)',
-    'বৌভাত / ওয়ালিমা (Bou Bhat / Walima)',
-    'জন্মদিন (Birthday Party)',
-    'আকিকা (Aqiqa)',
-    'বিবাহবার্ষিকী (Anniversary)',
-    'পারিবারিক পুনর্মিলনী (Family Reunion)',
-    'কর্পোরেট এজিএম (AGM / Annual General Meeting)',
-    'প্রডাক্ট লঞ্চ (Product Launch)',
-    'কনফারেন্স ও সেমিনার (Conferences & Seminars)',
-    'কর্পোরেট ডিনার ও গ্যালা নাইট (Corporate Dinner & Gala Night)',
-    'মেলা ও প্রদর্শনী (Trade Fairs & Exhibitions)',
-    'সমাবর্তন ও র্যাগ ডে (Graduation & Rag Day)',
-    'অ্যালামনাই রিইউনিয়ন (Alumni Reunion)',
-    'সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট (Cultural Shows & Concerts)',
-    'ইফতার মাহফিল (Iftar Mahfil)',
-    'দোয়া ও মিলাদ মাহফিল (Prayer Gatherings)',
-    'প্রেস কনফারেন্স ও মিটিং (Press Conferences)',
-    'অন্যান্য (Other)',
+  static const List<Map<String, String>> _eventTypeList = [
+    {'value': 'বিয়ে', 'label': '১. বিয়ে'},
+    {'value': 'গায়ে হলুদ', 'label': '২. গায়ে হলুদ'},
+    {'value': 'মেহেদি নাইট', 'label': '৩. মেহেদি নাইট'},
+    {'value': 'আকদ / এনগেজমেন্ট', 'label': '৪. আকদ / এনগেজমেন্ট'},
+    {'value': 'বৌভাত / ওয়ালিমা', 'label': '৫. বৌভাত / ওয়ালিমা'},
+    {'value': 'জন্মদিন', 'label': '৬. জন্মদিন'},
+    {'value': 'আকিকা', 'label': '৭. আকিকা'},
+    {'value': 'বিবাহবার্ষিকী', 'label': '৮. বিবাহবার্ষিকী'},
+    {'value': 'পারিবারিক পুনর্মিলনী', 'label': '৯. পারিবারিক পুনর্মিলনী'},
+    {'value': 'কর্পোরেট এজিএম', 'label': '১০. কর্পোরেট এজিএম'},
+    {'value': 'প্রডাক্ট লঞ্চ', 'label': '১১. প্রডাক্ট লঞ্চ'},
+    {'value': 'কনফারেন্স ও সেমিনার', 'label': '১২. কনফারেন্স ও সেমিনার'},
+    {'value': 'কর্পোরেট ডিনার ও গ্যালা নাইট', 'label': '১৩. কর্পোরেট ডিনার ও গ্যালা নাইট'},
+    {'value': 'মেলা ও প্রদর্শনী', 'label': '১৪. মেলা ও প্রদর্শনী'},
+    {'value': 'সমাবর্তন ও র্যাগ ডে', 'label': '১৫. সমাবর্তন ও র্যাগ ডে'},
+    {'value': 'অ্যালামনাই রিইউনিয়ন', 'label': '১৬. অ্যালামনাই রিইউনিয়ন'},
+    {'value': 'সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট', 'label': '১৭. সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট'},
+    {'value': 'ইফতার মাহফিল', 'label': '১৮. ইফতার মাহফিল'},
+    {'value': 'দোয়া ও মিলাদ মাহফিল', 'label': '১৯. দোয়া ও মিলাদ মাহফিল'},
+    {'value': 'প্রেস কনফারেন্স ও মিটিং', 'label': '২০. প্রেস কনফারেন্স ও মিটিং'},
+    {'value': 'অন্যান্য', 'label': 'অন্যান্য'},
   ];
 
   String _normalizeEventType(String? type) {
-    if (type == null || type.trim().isEmpty) return _eventTypes.first;
-    if (_eventTypes.contains(type)) return type;
-    switch (type.toLowerCase()) {
-      case 'wedding':
-        return 'বিয়ে (Wedding Reception)';
-      case 'holud':
-        return 'গায়ে হলুদ (Gaye Holud)';
-      case 'birthday':
-        return 'জন্মদিন (Birthday Party)';
-      case 'corporate':
-        return 'কর্পোরেট ডিনার ও গ্যালা নাইট (Corporate Dinner & Gala Night)';
-      case 'seminar':
-        return 'কনফারেন্স ও সেমিনার (Conferences & Seminars)';
-      case 'exhibition':
-        return 'মেলা ও প্রদর্শনী (Trade Fairs & Exhibitions)';
-      case 'other':
-        return 'অন্যান্য (Other)';
-      default:
-        return type;
+    if (type == null || type.trim().isEmpty) return 'বিয়ে';
+    final clean = type.trim();
+    for (final e in _eventTypeList) {
+      if (e['value'] == clean || e['label'] == clean) return e['value']!;
     }
+    final lower = clean.toLowerCase();
+    if (lower.contains('বিয়ে') || lower.contains('wedding')) return 'বিয়ে';
+    if (lower.contains('হলুদ') || lower.contains('holud')) return 'গায়ে হলুদ';
+    if (lower.contains('মেহেদি') || lower.contains('mehendi')) return 'মেহেদি নাইট';
+    if (lower.contains('আকদ') || lower.contains('এনগেজমেন্ট') || lower.contains('akht') || lower.contains('engagement')) return 'আকদ / এনগেজমেন্ট';
+    if (lower.contains('বৌভাত') || lower.contains('ওয়ালিমা') || lower.contains('walima') || lower.contains('bou bhat')) return 'বৌভাত / ওয়ালিমা';
+    if (lower.contains('জন্মদিন') || lower.contains('birthday')) return 'জন্মদিন';
+    if (lower.contains('আকিকা') || lower.contains('aqiqa')) return 'আকিকা';
+    if (lower.contains('বিবাহবার্ষিকী') || lower.contains('anniversary')) return 'বিবাহবার্ষিকী';
+    if (lower.contains('পুনর্মিলনী') || lower.contains('reunion')) return 'পারিবারিক পুনর্মিলনী';
+    if (lower.contains('এজিএম') || lower.contains('agm')) return 'কর্পোরেট এজিএম';
+    if (lower.contains('প্রডাক্ট') || lower.contains('product launch')) return 'প্রডাক্ট লঞ্চ';
+    if (lower.contains('কনফারেন্স') || lower.contains('সেমিনার') || lower.contains('seminar')) return 'কনফারেন্স ও সেমিনার';
+    if (lower.contains('গ্যালা নাইট') || lower.contains('dinner')) return 'কর্পোরেট ডিনার ও গ্যালা নাইট';
+    if (lower.contains('মেলা') || lower.contains('প্রদর্শনী') || lower.contains('fair') || lower.contains('exhibition')) return 'মেলা ও প্রদর্শনী';
+    if (lower.contains('সমাবর্তন') || lower.contains('র্যাগ ডে') || lower.contains('rag day')) return 'সমাবর্তন ও র্যাগ ডে';
+    if (lower.contains('অ্যালামনাই') || lower.contains('alumni')) return 'অ্যালামনাই রিইউনিয়ন';
+    if (lower.contains('সাংস্কৃতিক') || lower.contains('কনসার্ট') || lower.contains('concert')) return 'সাংস্কৃতিক অনুষ্ঠান ও কনসার্ট';
+    if (lower.contains('ইফতার') || lower.contains('iftar')) return 'ইফতার মাহফিল';
+    if (lower.contains('দোয়া') || lower.contains('মিলাদ')) return 'দোয়া ও মিলাদ মাহফিল';
+    if (lower.contains('প্রেস') || lower.contains('মিটিং') || lower.contains('press')) return 'প্রেস কনফারেন্স ও মিটিং';
+    if (lower.contains('অন্যান্য') || lower.contains('other')) return 'অন্যান্য';
+    return clean;
   }
 
   List<DropdownMenuItem<String>> _getEventDropdownItems(String? currentType) {
     final normalized = _normalizeEventType(currentType);
-    final allTypes = List<String>.from(_eventTypes);
-    if (!allTypes.contains(normalized)) {
-      allTypes.add(normalized);
-    }
-    return allTypes.map((type) => DropdownMenuItem<String>(
-      value: type,
+    final items = _eventTypeList.map((e) => DropdownMenuItem<String>(
+      value: e['value']!,
       child: Text(
-        type,
+        e['label']!,
         overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
       ),
     )).toList();
+
+    if (!_eventTypeList.any((e) => e['value'] == normalized)) {
+      items.add(DropdownMenuItem<String>(
+        value: normalized,
+        child: Text(normalized, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
+      ));
+    }
+    return items;
   }
 
   @override
@@ -152,7 +165,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
       _items.add(BookingItem(
         eventDate: defaultDate,
         slot: 'day',
-        eventType: _eventTypes.first,
+        eventType: 'বিয়ে',
         serverRate: _toDouble(tenant?['default_server_rate'] ?? 500),
         basePrice: pricePerSlot,
         subTotal: pricePerSlot,
@@ -320,52 +333,76 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
       backgroundColor: AppTheme.backgroundSlate,
       appBar: AppBar(
         title: Text(widget.booking == null ? 'নতুন বুকিং' : 'বুকিং এডিট', 
-          style: GoogleFonts.manrope(fontWeight: FontWeight.w800)),
+          style: GoogleFonts.manrope(fontWeight: FontWeight.w800, fontSize: 18)),
         centerTitle: false,
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
-        : Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader('গ্রাহকের তথ্য'),
-                        _buildCustomerCard(),
-                        
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildSectionHeader('বুকিং বিস্তারিত'),
-                            TextButton.icon(
-                              onPressed: _addNewItem,
-                              icon: const Icon(Icons.add_circle_outline, size: 20),
-                              label: const Text('দিন যোগ করুন', style: TextStyle(fontWeight: FontWeight.bold)),
-                              style: TextButton.styleFrom(foregroundColor: AppTheme.primaryEmerald),
-                            ),
-                          ],
-                        ),
-                        ...List.generate(_items.length, (index) => _buildItemCard(index)),
-                        
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('সারসংক্ষেপ ও হিসাব'),
-                        _buildSummaryCard(),
-                        const SizedBox(height: 24),
-                        _buildSectionHeader('অতিরিক্ত নোট'),
-                        _buildNotesCard(),
-                        const SizedBox(height: 100),
-                      ],
+        : Theme(
+            data: Theme.of(context).copyWith(
+              inputDecorationTheme: Theme.of(context).inputDecorationTheme.copyWith(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: Colors.grey.withAlpha(25)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppTheme.primaryEmerald, width: 1.8),
+                ),
+              ),
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader('গ্রাহকের তথ্য'),
+                          _buildCustomerCard(),
+                          
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildSectionHeader('বুকিং বিস্তারিত'),
+                              TextButton.icon(
+                                onPressed: _addNewItem,
+                                icon: const Icon(Icons.add_circle_outline, size: 18),
+                                label: const Text('দিন যোগ করুন', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppTheme.primaryEmerald,
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ...List.generate(_items.length, (index) => _buildItemCard(index)),
+                          
+                          const SizedBox(height: 14),
+                          _buildSectionHeader('সারসংক্ষেপ ও হিসাব'),
+                          _buildSummaryCard(),
+                          const SizedBox(height: 14),
+                          _buildSectionHeader('অতিরিক্ত নোট'),
+                          _buildNotesCard(),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                _buildBottomAction(),
-              ],
+                  _buildBottomAction(),
+                ],
+              ),
             ),
           ),
     );
@@ -373,39 +410,39 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(title, style: GoogleFonts.manrope(
-        fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textNavy)),
+        fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textNavy)),
     );
   }
 
   Widget _buildCustomerCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 20, offset: const Offset(0, 10))],
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 14, offset: const Offset(0, 6))],
       ),
       child: Column(
         children: [
           TextFormField(
             controller: _nameController,
-            decoration: const InputDecoration(labelText: 'পুরো নাম', prefixIcon: Icon(Icons.person_outline)),
+            decoration: const InputDecoration(labelText: 'পুরো নাম', prefixIcon: Icon(Icons.person_outline, size: 20)),
             validator: (v) => v!.isEmpty ? 'নাম লিখুন' : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _phoneController,
-            decoration: const InputDecoration(labelText: 'মোবাইল নম্বর', prefixIcon: Icon(Icons.phone_android_outlined)),
+            decoration: const InputDecoration(labelText: 'মোবাইল নম্বর', prefixIcon: Icon(Icons.phone_android_outlined, size: 20)),
             keyboardType: TextInputType.phone,
             validator: (v) => v!.isEmpty ? 'মোবাইল লিখুন' : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           TextFormField(
             controller: _addressController,
             maxLines: 2,
-            decoration: const InputDecoration(labelText: 'ঠিকানা', prefixIcon: Icon(Icons.location_on_outlined), alignLabelWithHint: true),
+            decoration: const InputDecoration(labelText: 'ঠিকানা', prefixIcon: Icon(Icons.location_on_outlined, size: 20), alignLabelWithHint: true),
           ),
         ],
       ),
@@ -415,24 +452,24 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   Widget _buildItemCard(int index) {
     final item = _items[index];
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppTheme.primaryEmerald.withAlpha(30)),
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: AppTheme.primaryEmerald.withAlpha(10),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('দিন ${index + 1}', style: const TextStyle(fontWeight: FontWeight.w800, color: AppTheme.primaryEmerald)),
+                Text('দিন ${index + 1}', style: const TextStyle(fontWeight: FontWeight.w800, color: AppTheme.primaryEmerald, fontSize: 14)),
                 if (_items.length > 1)
                   GestureDetector(
                     onTap: () {
@@ -442,13 +479,13 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                       });
                       _checkAllAvailability();
                     },
-                    child: const Icon(Icons.delete_sweep_outlined, color: Colors.red, size: 24),
+                    child: const Icon(Icons.delete_sweep_outlined, color: Colors.red, size: 20),
                   ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -456,7 +493,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 // Event Type Dropdown
                 DropdownButtonFormField<String>(
                   value: _normalizeEventType(item.eventType),
-                  decoration: const InputDecoration(labelText: 'ইভেন্টের ধরন', prefixIcon: Icon(Icons.celebration_outlined)),
+                  decoration: const InputDecoration(labelText: 'ইভেন্টের ধরন', prefixIcon: Icon(Icons.celebration_outlined, size: 20)),
                   isExpanded: true,
                   items: _getEventDropdownItems(item.eventType),
                   onChanged: (val) => setState(() {
@@ -465,7 +502,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                     }
                   }),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 
                 // Date & Slot
                 Row(
@@ -489,19 +526,19 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                           }
                         },
                         child: InputDecorator(
-                          decoration: const InputDecoration(labelText: 'তারিখ', prefixIcon: Icon(Icons.calendar_today_outlined)),
-                          child: Text(item.eventDate, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          decoration: const InputDecoration(labelText: 'তারিখ', prefixIcon: Icon(Icons.calendar_today_outlined, size: 20)),
+                          child: Text(item.eventDate, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: (item.slot == 'night' || item.slot == 'evening') ? 'night' : 'day',
                         decoration: const InputDecoration(labelText: 'স্লট'),
                         items: const [
-                          DropdownMenuItem(value: 'day', child: Text('দিন (Day)')),
-                          DropdownMenuItem(value: 'night', child: Text('রাত (Night)')),
+                          DropdownMenuItem(value: 'day', child: Text('দিন (Day)', style: TextStyle(fontSize: 13.5))),
+                          DropdownMenuItem(value: 'night', child: Text('রাত (Night)', style: TextStyle(fontSize: 13.5))),
                         ],
                         onChanged: (val) {
                           if (val != null) {
@@ -516,43 +553,43 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                   ],
                 ),
                 if (_conflictErrors[index] != null && _conflictErrors[index]!.isNotEmpty) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.red.shade50,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.red.shade300),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.warning_amber_rounded, size: 18, color: Colors.red.shade700),
-                        const SizedBox(width: 8),
+                        Icon(Icons.warning_amber_rounded, size: 16, color: Colors.red.shade700),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             _conflictErrors[index]!,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red.shade800),
+                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.red.shade800),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
 
                 // Pricing Configuration
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.grey.withAlpha(10), borderRadius: BorderRadius.circular(16)),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(color: Colors.grey.withAlpha(10), borderRadius: BorderRadius.circular(14)),
                   child: Column(
                     children: [
                       _buildPriceField('ভাড়া (Base Price)', item.basePrice, (v) {
                         _items[index] = item.copyWith(basePrice: _toDouble(v));
                         _recalc(index);
                       }),
-                      const Divider(height: 24),
+                      const Divider(height: 14),
                       Row(
                         children: [
                           Expanded(
@@ -562,7 +599,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                               });
                             }),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: _buildSmallField('টেবিল', item.tableCount.toString(), (v) {
                               setState(() {
@@ -570,7 +607,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                               });
                             }),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: _buildSmallField('কর্মী সংখ্যা', item.serverCount.toString(), (v) {
                               _items[index] = item.copyWith(serverCount: int.tryParse(v) ?? 0);
@@ -583,9 +620,9 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 16),
-                const Text('অতিরিক্ত সুবিধাসমূহ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.grey)),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
+                const Text('অতিরিক্ত সুবিধাসমূহ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5, color: Colors.grey)),
+                const SizedBox(height: 4),
                 
                 // Addons with Prices
                 _buildAddonSection(
@@ -658,11 +695,11 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 ),
                 if (item.serverCount > 0)
                   Container(
-                    margin: const EdgeInsets.only(top: 4, bottom: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    margin: const EdgeInsets.only(top: 2, bottom: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: item.isServerIncluded ? AppTheme.primaryEmerald.withAlpha(12) : Colors.orange.withAlpha(12),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: item.isServerIncluded ? AppTheme.primaryEmerald.withAlpha(60) : Colors.orange.withAlpha(80),
                       ),
@@ -678,7 +715,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                             value: item.isServerIncluded,
                             activeColor: AppTheme.primaryEmerald,
                             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
+                            visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                             onChanged: (val) {
                               _items[index] = item.copyWith(isServerIncluded: val ?? true);
                               _recalc(index);
@@ -691,15 +728,15 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                               children: [
                                 const Text(
                                   'সার্ভার খরচ বিলে অন্তর্ভুক্ত',
-                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textNavy),
+                                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppTheme.textNavy),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 1),
                                 Text(
                                   item.isServerIncluded
                                       ? 'মোট বিলে যুক্ত হবে (৳ ${(item.serverCount * item.serverRate).toStringAsFixed(0)})'
                                       : 'বিলে যুক্ত হবে না, গ্রাহক সরাসরি প্রদেয় (৳ ${(item.serverCount * item.serverRate).toStringAsFixed(0)})',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 10.5,
                                     fontWeight: FontWeight.w600,
                                     color: item.isServerIncluded ? Colors.green.shade800 : Colors.deepOrange.shade800,
                                   ),
@@ -712,12 +749,12 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                     ),
                   ),
                 
-                const Divider(height: 32),
+                const Divider(height: 18),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('দিনের মোট বিল:', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('৳ ${item.subTotal}', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppTheme.primaryEmerald)),
+                    const Text('দিনের মোট বিল:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    Text('৳ ${item.subTotal}', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.primaryEmerald)),
                   ],
                 ),
               ],
@@ -731,15 +768,20 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   Widget _buildPriceField(String label, double value, Function(String) onChanged) {
     return Row(
       children: [
-        Expanded(child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
+        Expanded(child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5))),
         SizedBox(
-          width: 120,
+          width: 110,
+          height: 36,
           child: TextFormField(
             initialValue: value.toString(),
             textAlign: TextAlign.right,
             keyboardType: TextInputType.number,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryEmerald),
-            decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), prefixText: '৳ '),
+            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryEmerald, fontSize: 14),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              prefixText: '৳ ',
+            ),
             onChanged: onChanged,
           ),
         ),
@@ -750,7 +792,12 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   Widget _buildSmallField(String label, String value, Function(String) onChanged) {
     return TextFormField(
       initialValue: value,
-      decoration: InputDecoration(labelText: label, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      ),
+      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
       keyboardType: TextInputType.number,
       onChanged: onChanged,
     );
@@ -758,28 +805,48 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   Widget _buildAddonSection(String label, bool isActive, double price, {required Function(bool?) onToggle, required Function(String) onPriceChange, bool isCheckboxVisible = true, Widget? extra}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               if (isCheckboxVisible)
-                Transform.scale(
-                  scale: 0.9,
-                  child: Checkbox(value: isActive, onChanged: onToggle, activeColor: AppTheme.primaryEmerald, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+                Checkbox(
+                  value: isActive,
+                  onChanged: onToggle,
+                  activeColor: AppTheme.primaryEmerald,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                )
+              else
+                const SizedBox(width: 4),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                    color: isActive ? AppTheme.textNavy : Colors.grey.shade600,
+                  ),
                 ),
-              Expanded(child: Text(label, style: TextStyle(fontWeight: isActive ? FontWeight.bold : FontWeight.normal, color: isActive ? AppTheme.textNavy : Colors.grey))),
+              ),
               if (isActive || !isCheckboxVisible)
                 SizedBox(
-                  width: 100,
-                  height: 40,
+                  width: 95,
+                  height: 34,
                   child: TextFormField(
                     initialValue: price.toString(),
                     textAlign: TextAlign.right,
                     keyboardType: TextInputType.number,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                    decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8), prefixText: '৳ '),
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      prefixText: '৳ ',
+                    ),
                     onChanged: onPriceChange,
                   ),
                 ),
@@ -787,7 +854,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
           ),
           if (isActive && extra != null) 
             Padding(
-              padding: const EdgeInsets.only(left: 48, top: 4, bottom: 8),
+              padding: const EdgeInsets.only(left: 32, top: 4, bottom: 4),
               child: extra,
             ),
         ],
@@ -807,14 +874,14 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
           isExpanded: true,
           decoration: InputDecoration(
             labelText: '$type ভেন্ডর নির্বাচন করুন',
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             isDense: true,
           ),
           items: [
-            const DropdownMenuItem<int>(value: null, child: Text('ভেন্ডর নির্বাচন করুন')),
+            const DropdownMenuItem<int>(value: null, child: Text('ভেন্ডর নির্বাচন করুন', style: TextStyle(fontSize: 13))),
             ...filteredVendors.map((v) => DropdownMenuItem<int>(
               value: v['id'],
-              child: Text(v['name']),
+              child: Text(v['name'], style: const TextStyle(fontSize: 13)),
             )),
           ],
           onChanged: onChanged,
@@ -826,38 +893,40 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   Widget _buildSummaryCard() {
     final due = _totalAmount - (double.tryParse(_advanceController.text) ?? 0);
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.primaryEmerald,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: AppTheme.primaryEmerald.withAlpha(50), blurRadius: 20, offset: const Offset(0, 10))],
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: AppTheme.primaryEmerald.withAlpha(40), blurRadius: 14, offset: const Offset(0, 6))],
       ),
       child: Column(
         children: [
           _summaryRow('মোট ইভেন্ট বিল', '৳ $_totalAmount', isInverse: true),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Row(
             children: [
-              const Expanded(child: Text('অগ্রিম জমা (Advance)', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600))),
+              const Expanded(child: Text('অগ্রিম জমা (Advance)', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13.5))),
               SizedBox(
-                width: 120,
+                width: 110,
+                height: 38,
                 child: TextField(
                   controller: _advanceController,
                   textAlign: TextAlign.right,
                   keyboardType: TextInputType.number,
                   onChanged: (v) => setState(() {}),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white.withAlpha(30),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                   ),
                 ),
               ),
             ],
           ),
-          const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(color: Colors.white24)),
+          const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Divider(color: Colors.white24, height: 1)),
           _summaryRow('বকেয়া (Due Amount)', '৳ $due', isInverse: true, isLarge: true),
         ],
       ),
@@ -866,19 +935,19 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   Widget _buildNotesCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 20, offset: const Offset(0, 10))],
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 14, offset: const Offset(0, 6))],
       ),
       child: TextFormField(
         controller: _notesController,
-        maxLines: 3,
+        maxLines: 2,
         decoration: const InputDecoration(
           labelText: 'অতিরিক্ত নোট (ঐচ্ছিক)',
           hintText: 'এখানে কিছু লিখুন...',
-          prefixIcon: Icon(Icons.note_alt_outlined),
+          prefixIcon: Icon(Icons.note_alt_outlined, size: 20),
           alignLabelWithHint: true,
         ),
       ),
@@ -889,11 +958,11 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: isInverse ? Colors.white70 : Colors.grey, fontWeight: FontWeight.w600)),
+        Text(label, style: TextStyle(color: isInverse ? Colors.white70 : Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 13.5)),
         Text(value, style: TextStyle(
           color: isInverse ? Colors.white : AppTheme.textNavy,
           fontWeight: FontWeight.w900,
-          fontSize: isLarge ? 24 : 18,
+          fontSize: isLarge ? 20 : 16,
         )),
       ],
     );
@@ -901,17 +970,24 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   Widget _buildBottomAction() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10, offset: const Offset(0, -5))],
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10, offset: const Offset(0, -4))],
       ),
       child: SafeArea(
-        child: ElevatedButton(
-          onPressed: _isSaving ? null : _save,
-          child: _isSaving 
-            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : const Text('বুকিং সম্পন্ন করুন'),
+        child: SizedBox(
+          height: 48,
+          child: ElevatedButton(
+            onPressed: _isSaving ? null : _save,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: _isSaving 
+              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Text('বুকিং সম্পন্ন করুন', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          ),
         ),
       ),
     );
