@@ -15,7 +15,6 @@
 /node_modules
 /coreui/node_modules
 /coreui/.cache
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
