@@ -17,10 +17,8 @@ class CalendarController extends Controller
             ->orderBy('event_date', 'asc')
             ->take(5)
             ->get();
-
-        $businessSetting = \App\Models\BusinessSetting::get();
             
-        return view('calendar.index', compact('upcomingBookings', 'businessSetting'));
+        return view('calendar.index', compact('upcomingBookings'));
     }
 
     public function events(Request $request)
