@@ -23,6 +23,12 @@
                         <div class="page-pretitle">একনজরে</div>
                         <h2 class="page-title">ড্যাশবোর্ড (এই মাস)</h2>
                     </div>
+                    <div class="col-auto ms-auto d-print-none btn-list">
+                        <a href="{{ route('loans.index') }}" class="btn btn-outline-primary btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                            ঋণ ও ঋণ পরিশোধ (Loans)
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -111,6 +117,40 @@
                     </div>
                 </div>
             </div>
+
+            @if(($unsettledLoansCount ?? 0) > 0 || ($totalLoanDue ?? 0) > 0)
+            <!-- Loans Alert / Overview -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="border-left: 4px solid #f59e0b !important;">
+                        <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="avatar avatar-md bg-warning text-white rounded-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                                </span>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h4 class="mb-0 fw-bold text-dark">হাওলাত / ঋণ ও দেনা</h4>
+                                        <span class="badge bg-warning-lt fw-bold">{{ $unsettledLoansCount }}টি অপরিশোধিত</span>
+                                    </div>
+                                    <div class="text-secondary small mt-1">
+                                        মোট প্রদেয় বকেয়া: <strong class="text-danger fs-4">৳ {{ number_format($totalLoanDue, 2) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('loans.index') }}" class="btn btn-outline-warning text-dark btn-sm fw-bold">
+                                    ঋণ ও ঋণ পরিশোধ তালিকা
+                                </a>
+                                <a href="{{ route('loans.create') }}" class="btn btn-warning text-dark btn-sm fw-bold">
+                                    + নতুন ঋণ এন্ট্রি
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
             <!-- Upcoming Bookings -->
             <div class="row">

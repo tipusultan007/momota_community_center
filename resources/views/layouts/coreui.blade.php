@@ -135,12 +135,19 @@
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('transactions.*') ? 'active' : '' }}" href="{{ route('transactions.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> সকল লেনদেন</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('incomes.*') ? 'active' : '' }}" href="{{ route('incomes.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> আয় ব্যবস্থাপনা</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}" href="{{ route('expenses.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> ব্যয় ব্যবস্থাপনা</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('loans.*') ? 'active' : '' }}" href="{{ route('loans.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> ঋণ ও ঋণ পরিশোধ (Loans)</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('income-categories.*') ? 'active' : '' }}" href="{{ route('income-categories.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> আয় ক্যাটাগরি</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> ব্যয় ক্যাটাগরি</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('vendors.*') ? 'active' : '' }}" href="{{ route('vendors.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> ভেন্ডর তালিকা</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('commissions.*') ? 'active' : '' }}" href="{{ route('commissions.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> কমিশন ও ভেন্ডর পাওনা</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" href="{{ route('assets.index') }}"><span class="nav-icon"><span class="nav-icon-bullet"></span></span> মালামাল ও ইনভেন্টরি</a></li>
             </ul>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('loans.*') ? 'active' : '' }}" href="{{ route('loans.index') }}">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M64 64C28.7 64 0 92.7 0 128V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64H64zm64 160a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM320 224a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM256 192a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                ঋণ ও দেনা (Loans)
+            </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
