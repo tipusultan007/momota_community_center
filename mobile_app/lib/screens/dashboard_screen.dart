@@ -11,8 +11,7 @@ import 'bookings/booking_form_screen.dart';
 import 'bookings/all_bookings_screen.dart';
 import 'calendar/calendar_screen.dart';
 import 'accounting/transaction_form_screen.dart';
-import 'customers/customer_list_screen.dart';
-import 'staff/staff_list_screen.dart';
+import 'loans/loan_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -114,13 +113,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final num totalExpense = _toNum(stats['total_expense']);
     final num netBalance = totalIncome - totalExpense;
     final int totalBookings = _toInt(stats['total_bookings']);
-    final int activeStaff = _toInt(
-      stats['active_staff'] ?? stats['total_staff'],
-    );
-    final int totalCustomers = _toInt(stats['total_customers']);
     final int todayEvents = _toInt(stats['today_events']);
     final int upcomingEvents = _toInt(stats['upcoming_events']);
     final num totalDue = _toNum(stats['total_due']);
+    final num totalLoanDue = _toNum(stats['total_loan_due']);
+    final num loanTotalRepaid = _toNum(stats['loan_total_repaid']);
+    final int unsettledLoansCount = _toInt(stats['unsettled_loans_count']);
     final int collectionRate = _toInt(
       stats['collection_rate'],
     ).clamp(0, 100).toInt();
@@ -162,8 +160,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         upcomingEvents: upcomingEvents,
                         totalBookings: totalBookings,
                         totalDue: totalDue,
-                        totalCustomers: totalCustomers,
-                        activeStaff: activeStaff,
+                        totalLoanDue: totalLoanDue,
+                        loanTotalRepaid: loanTotalRepaid,
+                        unsettledLoansCount: unsettledLoansCount,
                       ),
                       const SizedBox(height: 18),
                       _buildSectionHeader('দ্রুত কাজ'),
@@ -623,8 +622,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required int upcomingEvents,
     required int totalBookings,
     required num totalDue,
-    required int totalCustomers,
-    required int activeStaff,
+    required num totalLoanDue,
+    required num loanTotalRepaid,
+    required int unsettledLoansCount,
   }) {
     return Column(
       children: [
@@ -684,28 +684,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Expanded(
               child: _buildKpiCard(
-                title: 'মোট গ্রাহক',
-                value: '$totalCustomers জন',
-                subtitle: 'নিবন্ধিত গ্রাহক',
-                icon: Icons.people_alt_rounded,
-                accentColor: const Color(0xFF00838F),
+                title: 'হাওলাত / ঋণ বাকি',
+                value: '৳ ${_compactNumber(totalLoanDue)}',
+                subtitle: unsettledLoansCount > 0
+                    ? '$unsettledLoansCount টি ঋণ অপরিশোধিত'
+                    : 'সকল ঋণ পরিশোধিত',
+                icon: Icons.account_balance_wallet_rounded,
+                accentColor: const Color(0xFFC62828),
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const CustomerListScreen()),
+                  MaterialPageRoute(builder: (_) => const LoanListScreen()),
                 ),
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: _buildKpiCard(
-                title: 'কর্মরত স্টাফ',
-                value: '$activeStaff জন',
-                subtitle: 'সক্রিয় কর্মী',
-                icon: Icons.badge_rounded,
+                title: 'পরিশোধিত ঋণ',
+                value: '৳ ${_compactNumber(loanTotalRepaid)}',
+                subtitle: 'ধার পরিশোধ হিসাব',
+                icon: Icons.assignment_turned_in_rounded,
                 accentColor: const Color(0xFF2E7D32),
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const StaffListScreen()),
+                  MaterialPageRoute(builder: (_) => const LoanListScreen()),
                 ),
               ),
             ),
@@ -864,6 +866,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   builder: (_) =>
                       const TransactionFormScreen(initialType: 'expense'),
                 ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: _buildActionButton(
+              label: 'হাওলাত/ঋণ',
+              icon: Icons.handshake_outlined,
+              color: const Color(0xFFE65100),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LoanListScreen()),
               ),
             ),
           ),

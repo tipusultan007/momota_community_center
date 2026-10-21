@@ -69,6 +69,11 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $loanTotalBorrowed = (float) \App\Models\Loan::sum('amount');
+        $loanTotalRepaid = (float) \App\Models\Loan::sum('paid_amount');
+        $totalLoanDue = max(0, $loanTotalBorrowed - $loanTotalRepaid);
+        $unsettledLoansCount = (int) \App\Models\Loan::whereIn('status', ['pending', 'partial'])->count();
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -82,6 +87,10 @@ class DashboardController extends Controller
                     'today_events' => (int) $todayEvents,
                     'upcoming_events' => (int) $upcomingEvents,
                     'total_due' => $totalDue,
+                    'total_loan_due' => (float) $totalLoanDue,
+                    'loan_total_borrowed' => (float) $loanTotalBorrowed,
+                    'loan_total_repaid' => (float) $loanTotalRepaid,
+                    'unsettled_loans_count' => (int) $unsettledLoansCount,
                     'month_booking_value' => $monthBookingValue,
                     'collection_rate' => $collectionRate,
                 ],

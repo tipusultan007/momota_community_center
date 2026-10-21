@@ -395,12 +395,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
                 _drawerItem(Icons.calendar_month_rounded, 'মাসিক ক্যালেন্ডার', -1, screen: const CalendarScreen()),
                 
                 _buildDrawerSectionTitle('হিসাব ও লেনদেন'),
+                _drawerItem(
+                  Icons.handshake_outlined,
+                  'হাওলাত / ঋণ (ধার-দেনা)',
+                  -1,
+                  screen: const LoanListScreen(),
+                  isHighlighted: true,
+                ),
                 _drawerExpansionTile(
                   Icons.account_balance_wallet_rounded, 
                   'হিসাব রক্ষণ',
                   [
                     _drawerSubItem('লেনদেন বিবরণী', 2),
-                    _drawerSubItem('হাওলাত / ঋণ (ধার-দেনা)', -1, screen: const LoanListScreen()),
+                    _drawerSubItem('হাওলাত / ঋণ তালিকা', -1, screen: const LoanListScreen()),
                     _drawerSubItem('আয়/ব্যয় ক্যাটেগরি', -1, screen: const CategoryListScreen()),
                   ]
                 ),
