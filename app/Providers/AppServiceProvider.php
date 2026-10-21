@@ -28,9 +28,9 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Super Admin') ? true : null;
         });
 
-        // Global business context for UI
-        \Illuminate\Support\Facades\View::composer(['layouts.coreui', 'layouts.tabler'], function ($view) {
-            $view->with('businessSetting', auth()->check() ? \App\Models\BusinessSetting::get() : null);
+        // Global business context for UI (available across all blade views & components)
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            $view->with('businessSetting', \App\Models\BusinessSetting::get());
         });
     }
 }

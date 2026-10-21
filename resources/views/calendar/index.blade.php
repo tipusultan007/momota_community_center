@@ -231,7 +231,7 @@
                                                     {{ $ub->event_type }} - {{ $ub->booking?->customer?->name ?? 'N/A' }}
                                                 </div>
                                                 <div class="small text-muted mt-1">
-                                                    <span class="badge badge-outline text-{{ $color }}">{{ $businessSetting?->company_name }}</span>
+                                                    <span class="badge badge-outline text-{{ $color }}">{{ ($businessSetting ?? null)?->company_name ?? config('app.name', 'মমতা কমিউনিটি সেন্টার') }}</span>
                                                     <span class="ms-1">| @if($ub->slot == 'morning') সকালে @elseif($ub->slot == 'evening') রাতে @else সারাদিন @endif</span>
                                                 </div>
                                             </div>
