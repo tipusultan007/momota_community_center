@@ -22,11 +22,13 @@ import 'loans/loan_list_screen.dart';
 import 'settings/business_settings_screen.dart';
 import 'settings/change_password_screen.dart';
 import 'vendors/vendor_list_screen.dart';
+import 'package:flutter/services.dart';
 import 'staff/staff_form_screen.dart';
 import 'assets/asset_list_screen.dart';
 import '../theme/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../api/api_service.dart';
+import '../utils/exit_dialog_helper.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -36,6 +38,7 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -193,8 +196,32 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
 
-    return Scaffold(
-      drawer: _buildSidebar(context, user),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        // If drawer is open, close drawer first
+        if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+          _scaffoldKey.currentState?.closeDrawer();
+          return;
+        }
+
+        // If not on Dashboard tab, switch to Dashboard tab first
+        if (_selectedIndex != 0) {
+          setState(() => _selectedIndex = 0);
+          return;
+        }
+
+        // Prompt to confirm exit
+        final shouldExit = await ExitDialogHelper.showExitConfirmationDialog(context);
+        if (shouldExit && context.mounted) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: _buildSidebar(context, user),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
@@ -263,8 +290,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label) {
     final isSelected = _selectedIndex == index;
